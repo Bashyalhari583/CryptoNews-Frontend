@@ -809,7 +809,7 @@ const Navbar = ({ darkMode, setDarkMode }) => {
   }, [darkMode]);
 
   return (
-    <header className="fixed top-0 w-full z-50 border-b border-gray-700 dark:border-gray-300 bg-gray-900 dark:bg-white transition-colors duration-300">
+    <header className="fixed top-0 w-full z-50 border-b border-gray-700 dark:border-gray-300 bg-gray-900 dark:bg-gray-900 transition-colors duration-300">
       <div className="max-w-screen-2xl mx-auto px-6 sm:px-10 md:px-20 flex justify-between items-center py-4">
         {/* Logo */}
         <div className="flex items-center flex-shrink-0">
