@@ -64,13 +64,13 @@ const Hero = () => {
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Auto slide every 5 seconds
+  // Auto slide every 2 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) =>
         prevIndex === slides.length - 1 ? 0 : prevIndex + 1
       );
-    }, 5000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [slides.length]);

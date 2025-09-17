@@ -30,7 +30,7 @@ const Ticker = () => {
   }, []);
 
   return (
-    <aside className="border bg-gray-800 p-4 rounded-lg dark:bg-gray-700 w-full md:w-136 max-w-md">
+    <aside className="border bg-gray-800 p-4 rounded-lg dark:bg-gray-800 w-full md:w-136 max-w-md">
       <h3 className="font-semibold mb-3 text-white text-lg">Crypto Ticker</h3>
 
       {/* Search Input */}

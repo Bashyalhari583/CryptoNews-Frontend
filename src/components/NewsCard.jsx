@@ -4,7 +4,7 @@ const NewsCard = ({ img, title, desc }) => {
   return (
     <>
       {/* <div className="bg-gray-100 text-black rounded-lg overflow-hidden dark:bg-gray-700 p-2"> */}
-       <div className="bg-gray-800 rounded-lg overflow-hidden dark:bg-gray-700 p-2">
+       <div className="bg-gray-800 rounded-lg overflow-hidden dark:bg-gray-800 p-2">
       <img src={img} alt={title} className="w-full h-40 object-cover rounded" />
       <div className="p-4 dark:text-white">
         <h3 className="font-semibold">{title}</h3>
