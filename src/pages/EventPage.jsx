@@ -1506,7 +1506,7 @@ const EventPage = () => {
   // Fetch events
   const fetchEvents = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/events");
+      const res = await fetch("https://cryptonewsbackend.up.railway.app/api/events");
       const data = await res.json();
       setEvents(data.events?.slice(0, 12) || []);
     } catch (error) {
