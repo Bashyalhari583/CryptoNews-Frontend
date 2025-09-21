@@ -894,6 +894,462 @@
 
 // export default PricePage;
 
+// import React, { useState, useEffect, useMemo } from "react";
+// import {
+//   LineChart,
+//   Line,
+//   XAxis,
+//   YAxis,
+//   Tooltip,
+//   ResponsiveContainer,
+// } from "recharts";
+// import Navbar from "../components/Navbar";
+
+// const API_KEY = "n+W4A157ev/JP1HwXuqjp9dTDeZav4Ie/VpQK46jewY=";
+// const COINS_URL = "https://openapiv1.coinstats.app/coins?currency=USD";
+// const CHART_URL = (id) =>
+//   `https://openapiv1.coinstats.app/coins/${id}/charts?period=24h&currency=USD`;
+// // fallback for "global" - using bitcoin chart as proxy
+// const GLOBAL_CHART_URL =
+//   "https://openapiv1.coinstats.app/coins/bitcoin/charts?period=24h&currency=USD";
+
+// const PricePage = () => {
+//   const [darkMode, setDarkMode] = useState(true); // default dark
+//   const [cryptoData, setCryptoData] = useState([]);
+//   const [globalChart, setGlobalChart] = useState([]);
+//   const [coinChart, setCoinChart] = useState([]);
+//   const [selectedCoin, setSelectedCoin] = useState(null);
+//   const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
+//   const [search, setSearch] = useState("");
+//   const [loading, setLoading] = useState(false);
+
+//   // Apply dark class to root for Tailwind dark variants (optional)
+//   useEffect(() => {
+//     if (darkMode) document.documentElement.classList.add("dark");
+//     else document.documentElement.classList.remove("dark");
+//   }, [darkMode]);
+
+//   // Normalize API payload to array of coins
+//   const normalizeCoins = (data) => {
+//     if (!data) return [];
+//     if (Array.isArray(data)) return data;
+//     if (data.coins) return data.coins;
+//     if (data.result) return data.result;
+//     // sometimes returns object with `coins` nested elsewhere
+//     return [];
+//   };
+
+//   // Fetch coins list
+//   const fetchCrypto = async () => {
+//     setLoading(true);
+//     try {
+//       const res = await fetch(COINS_URL, {
+//         headers: { "Content-Type": "application/json", "X-API-KEY": API_KEY },
+//       });
+//       const data = await res.json();
+//       const coins = normalizeCoins(data);
+//       setCryptoData(coins);
+//       setLastUpdatedAt(new Date());
+//     } catch (err) {
+//       console.error("fetchCrypto error:", err);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Fetch global chart (using bitcoin as proxy)
+//   const fetchGlobalChart = async () => {
+//     try {
+//       const res = await fetch(GLOBAL_CHART_URL, {
+//         headers: { "Content-Type": "application/json", "X-API-KEY": API_KEY },
+//       });
+//       const data = await res.json();
+//       // data is array of [timestamp, price]
+//       const formatted = (data || []).map((item) => ({
+//         time: new Date(item[0]).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+//         price: item[1],
+//       }));
+//       setGlobalChart(formatted);
+//       setLastUpdatedAt(new Date());
+//     } catch (err) {
+//       console.error("fetchGlobalChart error:", err);
+//     }
+//   };
+
+//   // Fetch selected coin chart
+//   const fetchCoinChart = async (coinId) => {
+//     try {
+//       const res = await fetch(CHART_URL(coinId), {
+//         headers: { "Content-Type": "application/json", "X-API-KEY": API_KEY },
+//       });
+//       const data = await res.json();
+//       const formatted = (data || []).map((item) => ({
+//         time: new Date(item[0]).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+//         price: item[1],
+//       }));
+//       setCoinChart(formatted);
+//     } catch (err) {
+//       console.error("fetchCoinChart error:", err);
+//       setCoinChart([]);
+//     }
+//   };
+
+//   // initial + periodic refresh
+//   useEffect(() => {
+//     fetchCrypto();
+//     fetchGlobalChart();
+//     const interval = setInterval(() => {
+//       fetchCrypto();
+//       fetchGlobalChart();
+//     }, 60_000); // 60s
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // when user selects a coin, fetch its chart and update periodically
+//   useEffect(() => {
+//     if (!selectedCoin) {
+//       setCoinChart([]);
+//       return;
+//     }
+//     fetchCoinChart(selectedCoin.id);
+//     const i = setInterval(() => fetchCoinChart(selectedCoin.id), 30_000);
+//     return () => clearInterval(i);
+//   }, [selectedCoin]);
+
+//   // derive gainers, losers, topByMarketCap
+//   const gainers = useMemo(() => {
+//     return [...cryptoData]
+//       .filter((c) => c && typeof c.priceChange1d === "number")
+//       .sort((a, b) => b.priceChange1d - a.priceChange1d)
+//       .slice(0, 5);
+//   }, [cryptoData]);
+
+//   const losers = useMemo(() => {
+//     return [...cryptoData]
+//       .filter((c) => c && typeof c.priceChange1d === "number")
+//       .sort((a, b) => a.priceChange1d - b.priceChange1d)
+//       .slice(0, 5);
+//   }, [cryptoData]);
+
+//   const topByMarketCap = useMemo(() => {
+//     return [...cryptoData]
+//       .filter((c) => c && typeof c.marketCap === "number")
+//       .sort((a, b) => b.marketCap - a.marketCap)
+//       .slice(0, 5);
+//   }, [cryptoData]);
+
+//   const filteredCoins = useMemo(() => {
+//     const q = search.trim().toLowerCase();
+//     if (!q) return cryptoData;
+//     return cryptoData.filter(
+//       (c) =>
+//         c.name?.toLowerCase().includes(q) ||
+//         c.symbol?.toLowerCase().includes(q)
+//     );
+//   }, [cryptoData, search]);
+
+//   // determine suggestion: simple heuristic using 24h change
+//   const getSuggestion = (coin) => {
+//     if (!coin || typeof coin.priceChange1d !== "number") return "Hold";
+//     const change = coin.priceChange1d;
+//     if (change >= 5) return "Buy";
+//     if (change <= -5) return "Sell";
+//     return "Hold";
+//   };
+
+//   // small helper to format number safely
+//   const safeNum = (v, decimals = 2) =>
+//     typeof v === "number" ? v.toFixed(decimals) : "-";
+
+//   return (
+//     <div className="min-h-screen bg-gray-900 text-white transition-colors duration-300">
+//       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
+
+//       <div className="max-w-screen-2xl mx-auto px-6 md:px-20 pt-24 pb-10 space-y-6">
+//         {/* Global Chart */}
+//         <section className="w-full bg-gray-800 rounded-lg p-4 shadow">
+//           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
+//             <h2 className="text-xl font-semibold">🌍 Global Bitcoin Market — Live (24h)</h2>
+//             <div className="text-sm text-gray-300">
+//               {lastUpdatedAt ? `Last update: ${lastUpdatedAt.toLocaleTimeString()}` : "Updating..."}
+//             </div>
+//           </div>
+
+//           <div className="w-full h-72 md:h-80 mt-3">
+//             <ResponsiveContainer width="100%" height="100%">
+//               <LineChart data={globalChart}>
+//                 <XAxis dataKey="time" tick={{ fill: "#cbd5e1" }} interval="preserveEnd"/>
+//                 <YAxis tick={{ fill: "#cbd5e1" }} domain={["auto", "auto"]} />
+//                 <Tooltip
+//                   labelStyle={{ color: darkMode ? "#fff" : "#000" }}
+//                   formatter={(value) =>
+//                     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value)
+//                   }
+//                 />
+//                 <Line
+//                   type="monotone"
+//                   dataKey="price"
+//                   stroke="#10b981"
+//                   strokeWidth={2}
+//                   dot={false}
+//                 />
+//               </LineChart>
+//             </ResponsiveContainer>
+//           </div>
+
+//           {/* time axis hint */}
+//           <div className="text-xs text-gray-400 mt-2">Times shown are local (HH:MM)</div>
+//         </section>
+
+//         {/* 3-column summary (gainers / losers / top 3) */}
+//         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+//           {/* Left: 5 Gainers */}
+//           <div className="bg-gray-800 rounded-lg p-4 shadow">
+//             <h3 className="font-semibold mb-3">Top 5 Gainers (24h)</h3>
+//             <ul className="space-y-3">
+//               {gainers.map((c) => (
+//                 <li
+//                   key={c.id}
+//                   className="flex items-center justify-between gap-3 hover:bg-gray-700 p-2 rounded cursor-pointer"
+//                   onClick={() => {
+//                     setSelectedCoin(c);
+//                     fetchCoinChart(c.id);
+//                   }}
+//                 >
+//                   <div className="flex items-center gap-3">
+//                     <img src={c.icon} alt={c.name} className="w-8 h-8 rounded-full" />
+//                     <div>
+//                       <div className="text-sm font-medium">{c.name}</div>
+//                       <div className="text-xs text-gray-400">{c.symbol?.toUpperCase()}</div>
+//                     </div>
+//                   </div>
+//                   <div className="text-right">
+//                     <div className="text-sm">${safeNum(c.price, 4)}</div>
+//                     <div className={`text-xs ${c.priceChange1d >= 0 ? "text-green-400" : "text-red-400"}`}>
+//                       {safeNum(c.priceChange1d, 2)}%
+//                     </div>
+//                   </div>
+//                 </li>
+//               ))}
+//               {!gainers.length && <li className="text-sm text-gray-400">No data</li>}
+//             </ul>
+//           </div>
+
+//           {/* Middle: 5 Losers */}
+//           <div className="bg-gray-800 rounded-lg p-4 shadow">
+//             <h3 className="font-semibold mb-3">Top 5 Losers (24h)</h3>
+//             <ul className="space-y-3">
+//               {losers.map((c) => (
+//                 <li
+//                   key={c.id}
+//                   className="flex items-center justify-between gap-3 hover:bg-gray-700 p-2 rounded cursor-pointer"
+//                   onClick={() => {
+//                     setSelectedCoin(c);
+//                     fetchCoinChart(c.id);
+//                   }}
+//                 >
+//                   <div className="flex items-center gap-3">
+//                     <img src={c.icon} alt={c.name} className="w-8 h-8 rounded-full" />
+//                     <div>
+//                       <div className="text-sm font-medium">{c.name}</div>
+//                       <div className="text-xs text-gray-400">{c.symbol?.toUpperCase()}</div>
+//                     </div>
+//                   </div>
+//                   <div className="text-right">
+//                     <div className="text-sm">${safeNum(c.price, 4)}</div>
+//                     <div className={`text-xs ${c.priceChange1d >= 0 ? "text-green-400" : "text-red-400"}`}>
+//                       {safeNum(c.priceChange1d, 2)}%
+//                     </div>
+//                   </div>
+//                 </li>
+//               ))}
+//               {!losers.length && <li className="text-sm text-gray-400">No data</li>}
+//             </ul>
+//           </div>
+
+//           {/* Right: Top 5 by Market Cap */}
+//           <div className="bg-gray-800 rounded-lg p-4 shadow">
+//             <h3 className="font-semibold mb-3">Top 5 by Market Cap</h3>
+//             <ul className="space-y-3">
+//               {topByMarketCap.map((c) => (
+//                 <li
+//                   key={c.id}
+//                   className="flex items-center justify-between gap-3 hover:bg-gray-700 p-2 rounded cursor-pointer"
+//                   onClick={() => {
+//                     setSelectedCoin(c);
+//                     fetchCoinChart(c.id);
+//                   }}
+//                 >
+//                   <div className="flex items-center gap-3">
+//                     <img src={c.icon} alt={c.name} className="w-8 h-8 rounded-full" />
+//                     <div>
+//                       <div className="text-sm font-medium">{c.name}</div>
+//                       <div className="text-xs text-gray-400">{c.symbol?.toUpperCase()}</div>
+//                     </div>
+//                   </div>
+//                   <div className="text-right">
+//                     <div className="text-sm">${safeNum(c.price, 4)}</div>
+//                     <div className="text-xs text-gray-400">${c.marketCap ? Number(c.marketCap).toLocaleString() : "-"}</div>
+//                   </div>
+//                 </li>
+//               ))}
+//               {!topByMarketCap.length && <li className="text-sm text-gray-400">No data</li>}
+//             </ul>
+//           </div>
+//         </section>
+
+//         {/* Search + Table */}
+//         <section className="bg-gray-800 rounded-lg p-4 shadow">
+//           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+//             <h3 className="text-lg font-semibold">All Coins</h3>
+//             <div className="flex items-center gap-2 w-full md:w-1/3">
+//               <input
+//                 type="text"
+//                 value={search}
+//                 onChange={(e) => setSearch(e.target.value)}
+//                 placeholder="Search by name or symbol..."
+//                 className="w-full px-3 py-2 rounded bg-gray-700 placeholder-gray-300 focus:outline-none"
+//               />
+//               <button
+//                 onClick={() => {
+//                   fetchCrypto(); // refresh on demand
+//                 }}
+//                 className="px-3 py-2 rounded bg-green-600 hover:bg-green-500"
+//                 title="Refresh"
+//               >
+//                 Refresh
+//               </button>
+//             </div>
+//           </div>
+
+//           <div className="overflow-x-auto">
+//             <table className="min-w-full text-sm">
+//               <thead>
+//                 <tr className="border-b border-gray-700 text-gray-300">
+//                   <th className="py-2 px-2 text-left">Coin</th>
+//                   <th className="py-2 px-2 text-right">Price</th>
+//                   <th className="py-2 px-2 text-right">1H</th>
+//                   <th className="py-2 px-2 text-right">24H</th>
+//                   <th className="py-2 px-2 text-right">7D</th>
+//                   <th className="py-2 px-2 text-right">Market Cap</th>
+//                   <th className="py-2 px-2 text-right">Volume (24h)</th>
+//                 </tr>
+//               </thead>
+//               <tbody>
+//                 {filteredCoins.length === 0 && (
+//                   <tr>
+//                     <td colSpan={7} className="py-4 text-center text-gray-400">
+//                       {loading ? "Loading..." : "No coins matched"}
+//                     </td>
+//                   </tr>
+//                 )}
+
+//                 {filteredCoins.map((coin) => (
+//                   <tr
+//                     key={coin.id}
+//                     className="border-b border-gray-700 hover:bg-gray-700 cursor-pointer"
+//                     onClick={() => {
+//                       setSelectedCoin(coin);
+//                       fetchCoinChart(coin.id);
+//                       window.scrollTo({ top: 0, behavior: "smooth" });
+//                     }}
+//                   >
+//                     <td className="py-2 px-2 flex items-center gap-3">
+//                       <img src={coin.icon} alt={coin.name} className="w-6 h-6 rounded-full" />
+//                       <div>
+//                         <div className="text-sm font-medium">{coin.name}</div>
+//                         <div className="text-xs text-gray-400">{coin.symbol?.toUpperCase()}</div>
+//                       </div>
+//                     </td>
+//                     <td className="py-2 px-2 text-right">${safeNum(coin.price, 4)}</td>
+//                     <td className={`py-2 px-2 text-right ${coin.priceChange1h >= 0 ? "text-green-400" : "text-red-400"}`}>
+//                       {safeNum(coin.priceChange1h, 2)}%
+//                     </td>
+//                     <td className={`py-2 px-2 text-right ${coin.priceChange1d >= 0 ? "text-green-400" : "text-red-400"}`}>
+//                       {safeNum(coin.priceChange1d, 2)}%
+//                     </td>
+//                     <td className={`py-2 px-2 text-right ${coin.priceChange7d >= 0 ? "text-green-400" : "text-red-400"}`}>
+//                       {safeNum(coin.priceChange7d, 2)}%
+//                     </td>
+//                     <td className="py-2 px-2 text-right">${coin.marketCap ? Number(coin.marketCap).toLocaleString() : "-"}</td>
+//                     <td className="py-2 px-2 text-right">${coin.volume ? Number(coin.volume).toLocaleString() : "-"}</td>
+//                   </tr>
+//                 ))}
+//               </tbody>
+//             </table>
+//           </div>
+//         </section>
+
+//         {/* Selected coin popup */}
+//         {selectedCoin && (
+//           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
+//             <div className="w-full max-w-3xl bg-gray-800 rounded-lg p-5 relative shadow-lg">
+//               <button
+//                 className="absolute top-1 right-1 text-gray-300 hover:text-white"
+//                 onClick={() => setSelectedCoin(null)}
+//               >
+//                 ✖
+//               </button>
+
+//               {/* Chart on top */}
+//               <div className="w-full h-56 mb-4">
+//                 <ResponsiveContainer width="100%" height="100%">
+//                   <LineChart data={coinChart.length ? coinChart : coinChart }>
+//                     <XAxis dataKey="time" tick={{ fill: "#cbd5e1" }} />
+//                     <YAxis tick={{ fill: "#cbd5e1" }} domain={["auto", "auto"]} />
+//                     <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
+//                     <Line type="monotone" dataKey="price" stroke="#3b82f6" strokeWidth={2} dot={false} />
+//                   </LineChart>
+//                 </ResponsiveContainer>
+//               </div>
+
+//               {/* Details under the chart */}
+//               <div className="flex flex-col gap-2">
+//                 <div className="flex items-center gap-3">
+//                   <img src={selectedCoin.icon} alt={selectedCoin.name} className="w-10 h-10 rounded-full" />
+//                   <div>
+//                     <div className="text-xl font-semibold">{selectedCoin.name} ({selectedCoin.symbol?.toUpperCase()})</div>
+//                     <div className="text-sm text-gray-400">{selectedCoin.websiteUrl || ""}</div>
+//                   </div>
+//                 </div>
+
+//                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-2">
+//                   <div>
+//                     <div className="text-xs text-gray-400">Price</div>
+//                     <div className="font-medium">${safeNum(selectedCoin.price, 4)}</div>
+//                   </div>
+//                   <div>
+//                     <div className="text-xs text-gray-400">Market Cap</div>
+//                     <div className="font-medium">${selectedCoin.marketCap ? Number(selectedCoin.marketCap).toLocaleString() : "-"}</div>
+//                   </div>
+//                   <div>
+//                     <div className="text-xs text-gray-400">24h Volume</div>
+//                     <div className="font-medium">${selectedCoin.volume ? Number(selectedCoin.volume).toLocaleString() : "-"}</div>
+//                   </div>
+//                   <div>
+//                     <div className="text-xs text-gray-400">Supply</div>
+//                     <div className="font-medium">{selectedCoin.availableSupply ? Number(selectedCoin.availableSupply).toLocaleString() : "-"}</div>
+//                   </div>
+//                 </div>
+
+//                 <div className="mt-3">
+//                   <div className={`inline-block px-3 py-1 rounded ${getSuggestion(selectedCoin) === "Buy" ? "bg-green-600" : getSuggestion(selectedCoin) === "Sell" ? "bg-red-600" : "bg-yellow-500"} text-black font-semibold`}>
+//                     Suggestion: {getSuggestion(selectedCoin)} {getSuggestion(selectedCoin) === "Buy" ? "📈" : getSuggestion(selectedCoin) === "Sell" ? "📉" : "🤝"}
+//                   </div>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default PricePage;
+
+
+
 import React, { useState, useEffect, useMemo } from "react";
 import {
   LineChart,
@@ -904,17 +1360,17 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import Navbar from "../components/Navbar";
+import { useDarkMode } from "../context/ThemeContext"; // ⬅️ darkMode context
 
 const API_KEY = "n+W4A157ev/JP1HwXuqjp9dTDeZav4Ie/VpQK46jewY=";
 const COINS_URL = "https://openapiv1.coinstats.app/coins?currency=USD";
 const CHART_URL = (id) =>
   `https://openapiv1.coinstats.app/coins/${id}/charts?period=24h&currency=USD`;
-// fallback for "global" - using bitcoin chart as proxy
 const GLOBAL_CHART_URL =
   "https://openapiv1.coinstats.app/coins/bitcoin/charts?period=24h&currency=USD";
 
 const PricePage = () => {
-  const [darkMode, setDarkMode] = useState(true); // default dark
+  const { darkMode, setDarkMode } = useDarkMode(); // ⬅️ get darkMode state
   const [cryptoData, setCryptoData] = useState([]);
   const [globalChart, setGlobalChart] = useState([]);
   const [coinChart, setCoinChart] = useState([]);
@@ -923,23 +1379,19 @@ const PricePage = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Apply dark class to root for Tailwind dark variants (optional)
   useEffect(() => {
     if (darkMode) document.documentElement.classList.add("dark");
     else document.documentElement.classList.remove("dark");
   }, [darkMode]);
 
-  // Normalize API payload to array of coins
   const normalizeCoins = (data) => {
     if (!data) return [];
     if (Array.isArray(data)) return data;
     if (data.coins) return data.coins;
     if (data.result) return data.result;
-    // sometimes returns object with `coins` nested elsewhere
     return [];
   };
 
-  // Fetch coins list
   const fetchCrypto = async () => {
     setLoading(true);
     try {
@@ -957,16 +1409,17 @@ const PricePage = () => {
     }
   };
 
-  // Fetch global chart (using bitcoin as proxy)
   const fetchGlobalChart = async () => {
     try {
       const res = await fetch(GLOBAL_CHART_URL, {
         headers: { "Content-Type": "application/json", "X-API-KEY": API_KEY },
       });
       const data = await res.json();
-      // data is array of [timestamp, price]
       const formatted = (data || []).map((item) => ({
-        time: new Date(item[0]).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        time: new Date(item[0]).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         price: item[1],
       }));
       setGlobalChart(formatted);
@@ -976,7 +1429,6 @@ const PricePage = () => {
     }
   };
 
-  // Fetch selected coin chart
   const fetchCoinChart = async (coinId) => {
     try {
       const res = await fetch(CHART_URL(coinId), {
@@ -984,7 +1436,10 @@ const PricePage = () => {
       });
       const data = await res.json();
       const formatted = (data || []).map((item) => ({
-        time: new Date(item[0]).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        time: new Date(item[0]).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         price: item[1],
       }));
       setCoinChart(formatted);
@@ -994,18 +1449,16 @@ const PricePage = () => {
     }
   };
 
-  // initial + periodic refresh
   useEffect(() => {
     fetchCrypto();
     fetchGlobalChart();
     const interval = setInterval(() => {
       fetchCrypto();
       fetchGlobalChart();
-    }, 60_000); // 60s
+    }, 60_000);
     return () => clearInterval(interval);
   }, []);
 
-  // when user selects a coin, fetch its chart and update periodically
   useEffect(() => {
     if (!selectedCoin) {
       setCoinChart([]);
@@ -1016,27 +1469,32 @@ const PricePage = () => {
     return () => clearInterval(i);
   }, [selectedCoin]);
 
-  // derive gainers, losers, topByMarketCap
-  const gainers = useMemo(() => {
-    return [...cryptoData]
-      .filter((c) => c && typeof c.priceChange1d === "number")
-      .sort((a, b) => b.priceChange1d - a.priceChange1d)
-      .slice(0, 5);
-  }, [cryptoData]);
+  const gainers = useMemo(
+    () =>
+      [...cryptoData]
+        .filter((c) => c && typeof c.priceChange1d === "number")
+        .sort((a, b) => b.priceChange1d - a.priceChange1d)
+        .slice(0, 5),
+    [cryptoData]
+  );
 
-  const losers = useMemo(() => {
-    return [...cryptoData]
-      .filter((c) => c && typeof c.priceChange1d === "number")
-      .sort((a, b) => a.priceChange1d - b.priceChange1d)
-      .slice(0, 5);
-  }, [cryptoData]);
+  const losers = useMemo(
+    () =>
+      [...cryptoData]
+        .filter((c) => c && typeof c.priceChange1d === "number")
+        .sort((a, b) => a.priceChange1d - b.priceChange1d)
+        .slice(0, 5),
+    [cryptoData]
+  );
 
-  const topByMarketCap = useMemo(() => {
-    return [...cryptoData]
-      .filter((c) => c && typeof c.marketCap === "number")
-      .sort((a, b) => b.marketCap - a.marketCap)
-      .slice(0, 5);
-  }, [cryptoData]);
+  const topByMarketCap = useMemo(
+    () =>
+      [...cryptoData]
+        .filter((c) => c && typeof c.marketCap === "number")
+        .sort((a, b) => b.marketCap - a.marketCap)
+        .slice(0, 5),
+    [cryptoData]
+  );
 
   const filteredCoins = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -1048,7 +1506,6 @@ const PricePage = () => {
     );
   }, [cryptoData, search]);
 
-  // determine suggestion: simple heuristic using 24h change
   const getSuggestion = (coin) => {
     if (!coin || typeof coin.priceChange1d !== "number") return "Hold";
     const change = coin.priceChange1d;
@@ -1057,33 +1514,45 @@ const PricePage = () => {
     return "Hold";
   };
 
-  // small helper to format number safely
   const safeNum = (v, decimals = 2) =>
     typeof v === "number" ? v.toFixed(decimals) : "-";
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white transition-colors duration-300">
+    <div
+      className={`min-h-screen transition-colors duration-300 ${
+        darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
+      }`}
+    >
       <Navbar darkMode={darkMode} setDarkMode={setDarkMode} />
 
       <div className="max-w-screen-2xl mx-auto px-6 md:px-20 pt-24 pb-10 space-y-6">
         {/* Global Chart */}
-        <section className="w-full bg-gray-800 rounded-lg p-4 shadow">
+        <section
+          className={`w-full rounded-lg p-4 shadow transition-colors duration-300 ${
+            darkMode ? "bg-gray-800" : "bg-white"
+          }`}
+        >
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-3">
             <h2 className="text-xl font-semibold">🌍 Global Bitcoin Market — Live (24h)</h2>
-            <div className="text-sm text-gray-300">
-              {lastUpdatedAt ? `Last update: ${lastUpdatedAt.toLocaleTimeString()}` : "Updating..."}
+            <div className={`${darkMode ? "text-gray-300" : "text-gray-600"} text-sm`}>
+              {lastUpdatedAt
+                ? `Last update: ${lastUpdatedAt.toLocaleTimeString()}`
+                : "Updating..."}
             </div>
           </div>
 
           <div className="w-full h-72 md:h-80 mt-3">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={globalChart}>
-                <XAxis dataKey="time" tick={{ fill: "#cbd5e1" }} interval="preserveEnd"/>
-                <YAxis tick={{ fill: "#cbd5e1" }} domain={["auto", "auto"]} />
+                <XAxis dataKey="time" tick={{ fill: darkMode ? "#cbd5e1" : "#1f2937" }} />
+                <YAxis tick={{ fill: darkMode ? "#cbd5e1" : "#1f2937" }} domain={["auto", "auto"]} />
                 <Tooltip
                   labelStyle={{ color: darkMode ? "#fff" : "#000" }}
                   formatter={(value) =>
-                    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(value)
+                    new Intl.NumberFormat("en-US", {
+                      style: "currency",
+                      currency: "USD",
+                    }).format(value)
                   }
                 />
                 <Line
@@ -1096,110 +1565,65 @@ const PricePage = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-
-          {/* time axis hint */}
-          <div className="text-xs text-gray-400 mt-2">Times shown are local (HH:MM)</div>
+          <div className={`${darkMode ? "text-gray-400" : "text-gray-500"} text-xs mt-2`}>
+            Times shown are local (HH:MM)
+          </div>
         </section>
 
-        {/* 3-column summary (gainers / losers / top 3) */}
+        {/* Gainers / Losers / Top by Market Cap */}
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: 5 Gainers */}
-          <div className="bg-gray-800 rounded-lg p-4 shadow">
-            <h3 className="font-semibold mb-3">Top 5 Gainers (24h)</h3>
-            <ul className="space-y-3">
-              {gainers.map((c) => (
-                <li
-                  key={c.id}
-                  className="flex items-center justify-between gap-3 hover:bg-gray-700 p-2 rounded cursor-pointer"
-                  onClick={() => {
-                    setSelectedCoin(c);
-                    fetchCoinChart(c.id);
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <img src={c.icon} alt={c.name} className="w-8 h-8 rounded-full" />
-                    <div>
-                      <div className="text-sm font-medium">{c.name}</div>
-                      <div className="text-xs text-gray-400">{c.symbol?.toUpperCase()}</div>
+          {[{ title: "Top 5 Gainers", list: gainers }, { title: "Top 5 Losers", list: losers }, { title: "Top 5 by Market Cap", list: topByMarketCap }].map((group, idx) => (
+            <div
+              key={idx}
+              className={`rounded-lg p-4 shadow transition-colors duration-300 ${
+                darkMode ? "bg-gray-800" : "bg-white"
+              }`}
+            >
+              <h3 className="font-semibold mb-3">{group.title}</h3>
+              <ul className="space-y-3">
+                {group.list.map((c) => (
+                  <li
+                    key={c.id}
+                    className={`flex items-center justify-between gap-3 p-2 rounded cursor-pointer hover:${
+                      darkMode ? "bg-gray-700" : "bg-gray-200"
+                    }`}
+                    onClick={() => {
+                      setSelectedCoin(c);
+                      fetchCoinChart(c.id);
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <img src={c.icon} alt={c.name} className="w-8 h-8 rounded-full" />
+                      <div>
+                        <div className="text-sm font-medium">{c.name}</div>
+                        <div className={`${darkMode ? "text-gray-400" : "text-gray-500"} text-xs`}>
+                          {c.symbol?.toUpperCase()}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm">${safeNum(c.price, 4)}</div>
-                    <div className={`text-xs ${c.priceChange1d >= 0 ? "text-green-400" : "text-red-400"}`}>
-                      {safeNum(c.priceChange1d, 2)}%
+                    <div className="text-right">
+                      <div className="text-sm">${safeNum(c.price, 4)}</div>
+                      {c.priceChange1d !== undefined && (
+                        <div className={`text-xs ${c.priceChange1d >= 0 ? "text-green-400" : "text-red-400"}`}>
+                          {safeNum(c.priceChange1d, 2)}%
+                        </div>
+                      )}
+                      {c.marketCap && idx === 2 && <div className="text-xs">${Number(c.marketCap).toLocaleString()}</div>}
                     </div>
-                  </div>
-                </li>
-              ))}
-              {!gainers.length && <li className="text-sm text-gray-400">No data</li>}
-            </ul>
-          </div>
-
-          {/* Middle: 5 Losers */}
-          <div className="bg-gray-800 rounded-lg p-4 shadow">
-            <h3 className="font-semibold mb-3">Top 5 Losers (24h)</h3>
-            <ul className="space-y-3">
-              {losers.map((c) => (
-                <li
-                  key={c.id}
-                  className="flex items-center justify-between gap-3 hover:bg-gray-700 p-2 rounded cursor-pointer"
-                  onClick={() => {
-                    setSelectedCoin(c);
-                    fetchCoinChart(c.id);
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <img src={c.icon} alt={c.name} className="w-8 h-8 rounded-full" />
-                    <div>
-                      <div className="text-sm font-medium">{c.name}</div>
-                      <div className="text-xs text-gray-400">{c.symbol?.toUpperCase()}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm">${safeNum(c.price, 4)}</div>
-                    <div className={`text-xs ${c.priceChange1d >= 0 ? "text-green-400" : "text-red-400"}`}>
-                      {safeNum(c.priceChange1d, 2)}%
-                    </div>
-                  </div>
-                </li>
-              ))}
-              {!losers.length && <li className="text-sm text-gray-400">No data</li>}
-            </ul>
-          </div>
-
-          {/* Right: Top 5 by Market Cap */}
-          <div className="bg-gray-800 rounded-lg p-4 shadow">
-            <h3 className="font-semibold mb-3">Top 5 by Market Cap</h3>
-            <ul className="space-y-3">
-              {topByMarketCap.map((c) => (
-                <li
-                  key={c.id}
-                  className="flex items-center justify-between gap-3 hover:bg-gray-700 p-2 rounded cursor-pointer"
-                  onClick={() => {
-                    setSelectedCoin(c);
-                    fetchCoinChart(c.id);
-                  }}
-                >
-                  <div className="flex items-center gap-3">
-                    <img src={c.icon} alt={c.name} className="w-8 h-8 rounded-full" />
-                    <div>
-                      <div className="text-sm font-medium">{c.name}</div>
-                      <div className="text-xs text-gray-400">{c.symbol?.toUpperCase()}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm">${safeNum(c.price, 4)}</div>
-                    <div className="text-xs text-gray-400">${c.marketCap ? Number(c.marketCap).toLocaleString() : "-"}</div>
-                  </div>
-                </li>
-              ))}
-              {!topByMarketCap.length && <li className="text-sm text-gray-400">No data</li>}
-            </ul>
-          </div>
+                  </li>
+                ))}
+                {!group.list.length && <li className="text-sm text-gray-400">No data</li>}
+              </ul>
+            </div>
+          ))}
         </section>
 
         {/* Search + Table */}
-        <section className="bg-gray-800 rounded-lg p-4 shadow">
+        <section
+          className={`rounded-lg p-4 shadow transition-colors duration-300 ${
+            darkMode ? "bg-gray-800" : "bg-white"
+          }`}
+        >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
             <h3 className="text-lg font-semibold">All Coins</h3>
             <div className="flex items-center gap-2 w-full md:w-1/3">
@@ -1208,13 +1632,13 @@ const PricePage = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name or symbol..."
-                className="w-full px-3 py-2 rounded bg-gray-700 placeholder-gray-300 focus:outline-none"
+                className={`w-full px-3 py-2 rounded focus:outline-none transition-colors duration-300 ${
+                  darkMode ? "bg-gray-700 placeholder-gray-300 text-white" : "bg-gray-100 placeholder-gray-500 text-gray-900"
+                }`}
               />
               <button
-                onClick={() => {
-                  fetchCrypto(); // refresh on demand
-                }}
-                className="px-3 py-2 rounded bg-green-600 hover:bg-green-500"
+                onClick={fetchCrypto}
+                className="px-3 py-2 rounded bg-green-600 hover:bg-green-500 transition-colors duration-300"
                 title="Refresh"
               >
                 Refresh
@@ -1225,7 +1649,7 @@ const PricePage = () => {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-700 text-gray-300">
+                <tr className={`border-b ${darkMode ? "border-gray-700" : "border-gray-300"} ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
                   <th className="py-2 px-2 text-left">Coin</th>
                   <th className="py-2 px-2 text-right">Price</th>
                   <th className="py-2 px-2 text-right">1H</th>
@@ -1247,7 +1671,7 @@ const PricePage = () => {
                 {filteredCoins.map((coin) => (
                   <tr
                     key={coin.id}
-                    className="border-b border-gray-700 hover:bg-gray-700 cursor-pointer"
+                    className={`border-b ${darkMode ? "border-gray-700" : "border-gray-300"} hover:${darkMode ? "bg-gray-700" : "bg-gray-200"} cursor-pointer transition-colors duration-300`}
                     onClick={() => {
                       setSelectedCoin(coin);
                       fetchCoinChart(coin.id);
@@ -1258,7 +1682,9 @@ const PricePage = () => {
                       <img src={coin.icon} alt={coin.name} className="w-6 h-6 rounded-full" />
                       <div>
                         <div className="text-sm font-medium">{coin.name}</div>
-                        <div className="text-xs text-gray-400">{coin.symbol?.toUpperCase()}</div>
+                        <div className={`${darkMode ? "text-gray-400" : "text-gray-500"} text-xs`}>
+                          {coin.symbol?.toUpperCase()}
+                        </div>
                       </div>
                     </td>
                     <td className="py-2 px-2 text-right">${safeNum(coin.price, 4)}</td>
@@ -1280,10 +1706,14 @@ const PricePage = () => {
           </div>
         </section>
 
-        {/* Selected coin popup */}
+        {/* Selected Coin Modal */}
         {selectedCoin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-            <div className="w-full max-w-3xl bg-gray-800 rounded-lg p-5 relative shadow-lg">
+            <div
+              className={`w-full max-w-3xl rounded-lg p-5 relative shadow-lg transition-colors duration-300 ${
+                darkMode ? "bg-gray-800 text-white" : "bg-white text-gray-900"
+              }`}
+            >
               <button
                 className="absolute top-1 right-1 text-gray-300 hover:text-white"
                 onClick={() => setSelectedCoin(null)}
@@ -1291,24 +1721,26 @@ const PricePage = () => {
                 ✖
               </button>
 
-              {/* Chart on top */}
+              {/* Chart */}
               <div className="w-full h-56 mb-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={coinChart.length ? coinChart : coinChart }>
-                    <XAxis dataKey="time" tick={{ fill: "#cbd5e1" }} />
-                    <YAxis tick={{ fill: "#cbd5e1" }} domain={["auto", "auto"]} />
+                  <LineChart data={coinChart.length ? coinChart : []}>
+                    <XAxis dataKey="time" tick={{ fill: darkMode ? "#cbd5e1" : "#1f2937" }} />
+                    <YAxis tick={{ fill: darkMode ? "#cbd5e1" : "#1f2937" }} domain={["auto", "auto"]} />
                     <Tooltip formatter={(value) => `$${Number(value).toFixed(2)}`} />
                     <Line type="monotone" dataKey="price" stroke="#3b82f6" strokeWidth={2} dot={false} />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
 
-              {/* Details under the chart */}
+              {/* Details */}
               <div className="flex flex-col gap-2">
                 <div className="flex items-center gap-3">
                   <img src={selectedCoin.icon} alt={selectedCoin.name} className="w-10 h-10 rounded-full" />
                   <div>
-                    <div className="text-xl font-semibold">{selectedCoin.name} ({selectedCoin.symbol?.toUpperCase()})</div>
+                    <div className="text-xl font-semibold">
+                      {selectedCoin.name} ({selectedCoin.symbol?.toUpperCase()})
+                    </div>
                     <div className="text-sm text-gray-400">{selectedCoin.websiteUrl || ""}</div>
                   </div>
                 </div>
@@ -1333,8 +1765,21 @@ const PricePage = () => {
                 </div>
 
                 <div className="mt-3">
-                  <div className={`inline-block px-3 py-1 rounded ${getSuggestion(selectedCoin) === "Buy" ? "bg-green-600" : getSuggestion(selectedCoin) === "Sell" ? "bg-red-600" : "bg-yellow-500"} text-black font-semibold`}>
-                    Suggestion: {getSuggestion(selectedCoin)} {getSuggestion(selectedCoin) === "Buy" ? "📈" : getSuggestion(selectedCoin) === "Sell" ? "📉" : "🤝"}
+                  <div
+                    className={`inline-block px-3 py-1 rounded font-semibold ${
+                      getSuggestion(selectedCoin) === "Buy"
+                        ? "bg-green-600 text-black"
+                        : getSuggestion(selectedCoin) === "Sell"
+                        ? "bg-red-600 text-black"
+                        : "bg-yellow-500 text-black"
+                    }`}
+                  >
+                    Suggestion: {getSuggestion(selectedCoin)}{" "}
+                    {getSuggestion(selectedCoin) === "Buy"
+                      ? "📈"
+                      : getSuggestion(selectedCoin) === "Sell"
+                      ? "📉"
+                      : "🤝"}
                   </div>
                 </div>
               </div>
@@ -1347,6 +1792,7 @@ const PricePage = () => {
 };
 
 export default PricePage;
+
 
 // import React, { useState, useEffect, useMemo } from "react";
 // import {

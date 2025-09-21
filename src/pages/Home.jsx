@@ -10,17 +10,27 @@ const Home = () => {
   return (
     <>
     <Navbar />
-      <div className="max-w-screen-2xl mx-auto px-4 pt-20 md:px-8 space-y-8">
-      <Hero />
+      {/* <div className="max-w-screen-2xl mx-auto px-4 pt-20 md:px-8 space-y-8"> */}
+      {/* <Hero /> */}
 
-      <main className="max-w-screen-2xl mx-auto px-4 py-6 grid grid-cols-1 lg:flex gap-6">
-      <LatestNews />
+      {/* <main className="max-w-screen-2xl mx-auto px-4 py-6 grid grid-cols-1 lg:flex gap-6"> */}
+      {/* <LatestNews /> */}
       {/* News Section */}
-      <News />
-      <Ticker />
-      </main>
-      <Footer />
-    </div>
+      {/* <News /> */}
+      {/* <Ticker /> */}
+      {/* </main> */}
+      {/* <Footer /> */}
+    {/* </div> */}
+    <div className="max-w-screen-2xl mx-auto px-4 pt-20 md:px-8 space-y-8 bg-white text-black dark:bg-gray-900 dark:text-white">
+  <Hero />
+  <main className="grid grid-cols-1 lg:flex gap-6">
+    <LatestNews />
+    <News />
+    <Ticker />
+  </main>
+  <Footer />
+</div>
+
     </>
   )
 }

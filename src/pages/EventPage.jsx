@@ -1494,19 +1494,738 @@
 // export default EventPage;
 
 
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { FaThumbsUp, FaEye, FaBolt, FaFire, FaStar, FaCheckCircle } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [selectedEvent, setSelectedEvent] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null); // for image popup
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch("https://cryptonewsbackend.up.railway.app/api/events");
+//       const data = await res.json();
+//       setEvents(data.events?.slice(0, 12) || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section className="max-w-screen-2xl mx-auto p-6">
+//         <h2 className="text-3xl font-bold mb-6 text-center text-white dark:text-black">
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {events.map((event) => (
+//             <div
+//               key={event.id}
+//               className="bg-gray-800 dark:bg-gray-100 p-5 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-[1.02]"
+//             >
+//               <h3 className="text-lg font-semibold text-white dark:text-black mb-2">
+//                 {event.title || "No Title"}
+//               </h3>
+
+//               <p className="text-xs text-gray-400 dark:text-gray-600 mb-2">
+//                 {event.date_event ? new Date(event.date_event).toLocaleString() : "No Date"}
+//               </p>
+
+//               {/* Proof Image */}
+//               {event.proof && (
+//                 <div className="mb-3">
+//                   <img
+//                     src={event.proof}
+//                     alt="Event proof"
+//                     onClick={() => setPopupImage(event.proof)}
+//                     className="w-full h-32 object-cover rounded-md hover:scale-105 transition-transform cursor-pointer"
+//                   />
+//                 </div>
+//               )}
+
+//               {/* Coins */}
+//               {event.coins?.length > 0 && (
+//                 <div className="flex flex-wrap gap-1 mb-2">
+//                   {event.coins.map((c) => (
+//                     <span
+//                       key={c.coin_id}
+//                       className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full flex items-center gap-1"
+//                     >
+//                       {c.icon && <img src={c.icon} alt={c.symbol} className="w-4 h-4 rounded-full" />}
+//                       {c.symbol}
+//                     </span>
+//                   ))}
+//                 </div>
+//               )}
+
+//               {/* Categories */}
+//               {event.categories?.length > 0 && (
+//                 <div className="flex flex-wrap gap-1 mb-2">
+//                   {event.categories.map((cat) => (
+//                     <span
+//                       key={cat.category_id}
+//                       className="text-xs bg-green-500 text-white px-2 py-1 rounded-full"
+//                     >
+//                       {cat.name}
+//                     </span>
+//                   ))}
+//                 </div>
+//               )}
+
+//               <p className="text-gray-300 dark:text-gray-700 text-sm mb-3">
+//                 {event.description ? event.description.slice(0, 120) + "..." : "No description available"}
+//               </p>
+
+//               <div className="flex justify-between items-center">
+//                 <button
+//                   onClick={() => setSelectedEvent(event)}
+//                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
+//                 >
+//                   Read More
+//                 </button>
+
+//                 {event.source && (
+//                   <a
+//                     href={event.source}
+//                     target="_blank"
+//                     rel="noreferrer"
+//                     className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
+//                   >
+//                     🌐 Visit Source
+//                   </a>
+//                 )}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </section>
+
+//       {/* Event Modal */}
+//       {selectedEvent && (
+//         <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
+//           <div className="bg-gray-900 dark:bg-white max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-lg relative flex flex-col overflow-hidden">
+//             <button
+//               onClick={() => setSelectedEvent(null)}
+//               className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold"
+//             >
+//               ✖
+//             </button>
+
+//             <div className="mb-4">
+//               <h2 className="text-2xl font-bold text-white dark:text-black mb-1">
+//                 {selectedEvent.title}
+//               </h2>
+//               <p className="text-xs text-gray-400 dark:text-gray-600">
+//                 {selectedEvent.date_event ? new Date(selectedEvent.date_event).toLocaleString() : "No Date"}
+//               </p>
+//             </div>
+
+//             {/* Proof Image with Popup */}
+//             {selectedEvent.proof && (
+//               <div className="mb-4 flex flex-col gap-2">
+//                 <img
+//                   src={selectedEvent.proof}
+//                   alt="Event proof"
+//                   onClick={() => setPopupImage(selectedEvent.proof)}
+//                   className="w-full h-40 object-cover rounded-md hover:scale-105 transition-transform cursor-pointer"
+//                 />
+//                 {selectedEvent.source && (
+//                   <a
+//                     href={selectedEvent.source}
+//                     target="_blank"
+//                     rel="noreferrer"
+//                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm text-center"
+//                   >
+//                     🌐 Official Post
+//                   </a>
+//                 )}
+//               </div>
+//             )}
+
+//             {/* Description */}
+//             <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide mb-4">
+//               <p className="text-gray-300 dark:text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+//                 {selectedEvent.description || "No description available"}
+//               </p>
+//             </div>
+
+//             {/* Stats */}
+//             <div className="text-sm text-gray-400 mb-4 flex flex-wrap gap-4 items-center">
+//               <div className="flex items-center gap-1"><FaThumbsUp className="text-blue-500" /> {selectedEvent.votes}</div>
+//               <div className="flex items-center gap-1"><FaEye className="text-green-500" /> {selectedEvent.views}</div>
+//               <div className="flex items-center gap-1"><FaCheckCircle className="text-yellow-400" /> {selectedEvent.confidence}</div>
+//               <div className="flex items-center gap-1"><FaBolt className="text-purple-500" /> {selectedEvent.trending_score}</div>
+//               <div className="flex items-center gap-1"><FaFire className="text-red-500" /> {selectedEvent.popular_score}</div>
+//               <div className="flex items-center gap-1"><FaStar className="text-orange-400" /> {selectedEvent.significant_score}</div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Proof Image Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
+//           onClick={() => setPopupImage(null)} // close on background click
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-white text-2xl font-bold hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="Proof Full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import {
+//   FaThumbsUp,
+//   FaEye,
+//   FaBolt,
+//   FaFire,
+//   FaStar,
+//   FaCheckCircle,
+// } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [selectedEvent, setSelectedEvent] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events?.slice(0, 12) || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   return (
+//     <div className="min-h-screen bg-gray-900 text-white">
+//       <Navbar />
+
+//       <section className="max-w-screen-2xl mx-auto p-6">
+//         <h2 className="text-3xl font-bold mb-6 text-center text-blue-400">
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Events Grid */}
+//         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {events.map((event) => (
+//             <div
+//               key={event.id}
+//               className="bg-gray-800 p-5 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-[1.02]"
+//             >
+//               <h3 className="text-lg font-semibold text-white mb-2">
+//                 {event.title || "No Title"}
+//               </h3>
+
+//               <p className="text-xs text-gray-400 mb-2">
+//                 {event.date_event
+//                   ? new Date(event.date_event).toLocaleString()
+//                   : "No Date"}
+//               </p>
+
+//               {/* Proof Image */}
+//               {event.proof && (
+//                 <div className="mb-3">
+//                   <img
+//                     src={event.proof}
+//                     alt="Event proof"
+//                     onClick={() => setPopupImage(event.proof)}
+//                     className="w-full h-32 object-cover rounded-md hover:scale-105 transition-transform cursor-pointer"
+//                   />
+//                 </div>
+//               )}
+
+//               {/* Coins */}
+//               {event.coins?.length > 0 && (
+//                 <div className="flex flex-wrap gap-1 mb-2">
+//                   {event.coins.map((c) => (
+//                     <span
+//                       key={c.coin_id}
+//                       className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full flex items-center gap-1"
+//                     >
+//                       {c.icon && (
+//                         <img
+//                           src={c.icon}
+//                           alt={c.symbol}
+//                           className="w-4 h-4 rounded-full"
+//                         />
+//                       )}
+//                       {c.symbol}
+//                     </span>
+//                   ))}
+//                 </div>
+//               )}
+
+//               {/* Categories */}
+//               {event.categories?.length > 0 && (
+//                 <div className="flex flex-wrap gap-1 mb-2">
+//                   {event.categories.map((cat) => (
+//                     <span
+//                       key={cat.category_id}
+//                       className="text-xs bg-green-500 text-white px-2 py-1 rounded-full"
+//                     >
+//                       {cat.name}
+//                     </span>
+//                   ))}
+//                 </div>
+//               )}
+
+//               <p className="text-gray-300 text-sm mb-3">
+//                 {event.description
+//                   ? event.description.slice(0, 120) + "..."
+//                   : "No description available"}
+//               </p>
+
+//               <div className="flex justify-between items-center">
+//                 <button
+//                   onClick={() => setSelectedEvent(event)}
+//                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
+//                 >
+//                   Read More
+//                 </button>
+
+//                 {event.source && (
+//                   <a
+//                     href={event.source}
+//                     target="_blank"
+//                     rel="noreferrer"
+//                     className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
+//                   >
+//                     🌐 Visit Source
+//                   </a>
+//                 )}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </section>
+
+//       {/* Event Modal */}
+//       {selectedEvent && (
+//         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+//           <div className="bg-gray-800 text-white max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-lg relative flex flex-col overflow-hidden">
+//             <button
+//               onClick={() => setSelectedEvent(null)}
+//               className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold"
+//             >
+//               ✖
+//             </button>
+
+//             <div className="mb-4">
+//               <h2 className="text-2xl font-bold mb-1">
+//                 {selectedEvent.title}
+//               </h2>
+//               <p className="text-xs text-gray-400">
+//                 {selectedEvent.date_event
+//                   ? new Date(selectedEvent.date_event).toLocaleString()
+//                   : "No Date"}
+//               </p>
+//             </div>
+
+//             {/* Proof Image with Popup */}
+//             {selectedEvent.proof && (
+//               <div className="mb-4 flex flex-col gap-2">
+//                 <img
+//                   src={selectedEvent.proof}
+//                   alt="Event proof"
+//                   onClick={() => setPopupImage(selectedEvent.proof)}
+//                   className="w-full h-40 object-cover rounded-md hover:scale-105 transition-transform cursor-pointer"
+//                 />
+//                 {selectedEvent.source && (
+//                   <a
+//                     href={selectedEvent.source}
+//                     target="_blank"
+//                     rel="noreferrer"
+//                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm text-center"
+//                   >
+//                     🌐 Official Post
+//                   </a>
+//                 )}
+//               </div>
+//             )}
+
+//             {/* Description */}
+//             <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide mb-4">
+//               <p className="text-gray-300 whitespace-pre-line text-sm leading-relaxed">
+//                 {selectedEvent.description || "No description available"}
+//               </p>
+//             </div>
+
+//             {/* Stats */}
+//             <div className="text-sm text-gray-400 mb-4 flex flex-wrap gap-4 items-center">
+//               <div className="flex items-center gap-1">
+//                 <FaThumbsUp className="text-blue-500" />{" "}
+//                 {selectedEvent.votes || 0}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaEye className="text-green-500" />{" "}
+//                 {selectedEvent.views || 0}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaCheckCircle className="text-yellow-400" />{" "}
+//                 {selectedEvent.confidence || 0}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaBolt className="text-purple-500" />{" "}
+//                 {selectedEvent.trending_score || 0}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaFire className="text-red-500" />{" "}
+//                 {selectedEvent.popular_score || 0}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaStar className="text-orange-400" />{" "}
+//                 {selectedEvent.significant_score || 0}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Proof Image Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-[100]"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-white text-2xl font-bold hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="Proof Full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default EventPage;
+
+
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import {
+//   FaThumbsUp,
+//   FaEye,
+//   FaBolt,
+//   FaFire,
+//   FaStar,
+//   FaCheckCircle,
+//   FaLink,
+// } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [selectedEvent, setSelectedEvent] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events?.slice(0, 12) || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section className="max-w-screen-2xl mx-auto p-6">
+//         <h2 className="text-3xl font-bold mb-8 text-center text-white">
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Events Grid */}
+//         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {events.map((event) => (
+//             <div
+//               key={event.id}
+//               className="bg-gray-800 p-5 rounded-xl shadow-lg hover:shadow-2xl transition-transform transform hover:scale-[1.03] flex flex-col"
+//             >
+//               {/* Title */}
+//               <h3 className="text-lg font-bold text-white mb-1">
+//                 {event.title || "No Title"}
+//               </h3>
+
+//               {/* Date */}
+//               <p className="text-xs text-gray-400 mb-2">
+//                 {event.date_event
+//                   ? new Date(event.date_event).toLocaleString()
+//                   : "No Date"}
+//               </p>
+
+//               {/* Proof Image */}
+//               {event.proof && (
+//                 <div className="mb-3">
+//                   <img
+//                     src={event.proof}
+//                     alt="Event proof"
+//                     onClick={() => setPopupImage(event.proof)}
+//                     className="w-full h-32 object-cover rounded-md hover:scale-105 transition-transform cursor-pointer border border-gray-700"
+//                   />
+//                 </div>
+//               )}
+
+//               {/* Coins */}
+//               {event.coins?.length > 0 && (
+//                 <div className="flex flex-wrap gap-1 mb-2">
+//                   {event.coins.map((c) => (
+//                     <span
+//                       key={c.coin_id}
+//                       className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full flex items-center gap-1"
+//                     >
+//                       {c.icon && (
+//                         <img
+//                           src={c.icon}
+//                           alt={c.symbol}
+//                           className="w-4 h-4 rounded-full"
+//                         />
+//                       )}
+//                       {c.symbol}
+//                     </span>
+//                   ))}
+//                 </div>
+//               )}
+
+//               {/* Categories */}
+//               {event.categories?.length > 0 && (
+//                 <div className="flex flex-wrap gap-1 mb-2">
+//                   {event.categories.map((cat) => (
+//                     <span
+//                       key={cat.category_id}
+//                       className="text-xs bg-green-600 text-white px-2 py-1 rounded-full"
+//                     >
+//                       {cat.name}
+//                     </span>
+//                   ))}
+//                 </div>
+//               )}
+
+//               {/* Description */}
+//               <p className="text-gray-300 text-sm mb-3">
+//                 {event.description
+//                   ? event.description.slice(0, 120) + "..."
+//                   : "No description available"}
+//               </p>
+
+//               {/* Actions */}
+//               <div className="flex justify-between items-center mt-auto">
+//                 <button
+//                   onClick={() => setSelectedEvent(event)}
+//                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
+//                 >
+//                   Read More
+//                 </button>
+//                 {event.source && (
+//                   <a
+//                     href={event.source}
+//                     target="_blank"
+//                     rel="noreferrer"
+//                     className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
+//                   >
+//                     <FaLink /> Verified Source
+//                   </a>
+//                 )}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </section>
+
+//       {/* Event Modal */}
+//       {selectedEvent && (
+//         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+//           <div className="bg-gray-900 max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-2xl relative flex flex-col overflow-hidden">
+//             {/* Close Button */}
+//             <button
+//               onClick={() => setSelectedEvent(null)}
+//               className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold"
+//             >
+//               ✖
+//             </button>
+
+//             {/* Title & Date */}
+//             <div className="mb-4">
+//               <h2 className="text-2xl font-bold text-white mb-1">
+//                 {selectedEvent.title}
+//               </h2>
+//               <p className="text-xs text-gray-400">
+//                 {selectedEvent.date_event
+//                   ? new Date(selectedEvent.date_event).toLocaleString()
+//                   : "No Date"}
+//               </p>
+//             </div>
+
+//             {/* Proof Image */}
+//             {selectedEvent.proof && (
+//               <div className="mb-4 flex flex-col gap-2">
+//                 <img
+//                   src={selectedEvent.proof}
+//                   alt="Event proof"
+//                   onClick={() => setPopupImage(selectedEvent.proof)}
+//                   className="w-full h-40 object-cover rounded-md hover:scale-105 transition-transform cursor-pointer border border-gray-700"
+//                 />
+//                 {selectedEvent.source && (
+//                   <a
+//                     href={selectedEvent.source}
+//                     target="_blank"
+//                     rel="noreferrer"
+//                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm text-center"
+//                   >
+//                     🌐 Official Post
+//                   </a>
+//                 )}
+//               </div>
+//             )}
+
+//             {/* Full Description */}
+//             <div className="flex-1 overflow-y-auto pr-2 mb-4">
+//               <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">
+//                 {selectedEvent.description || "No description available"}
+//               </p>
+//             </div>
+
+//             {/* Stats */}
+//             <div className="text-sm text-gray-400 flex flex-wrap gap-4 items-center border-t border-gray-700 pt-3">
+//               <div className="flex items-center gap-1">
+//                 <FaThumbsUp className="text-blue-500" /> {selectedEvent.votes}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaEye className="text-green-500" /> {selectedEvent.views}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaCheckCircle className="text-yellow-400" />{" "}
+//                 {selectedEvent.confidence}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaBolt className="text-purple-500" />{" "}
+//                 {selectedEvent.trending_score}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaFire className="text-red-500" /> {selectedEvent.popular_score}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaStar className="text-orange-400" />{" "}
+//                 {selectedEvent.significant_score}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Proof Image Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-white text-2xl font-bold hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="Proof Full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { FaThumbsUp, FaEye, FaBolt, FaFire, FaStar, FaCheckCircle } from "react-icons/fa";
+import { useDarkMode } from "../context/ThemeContext";
+import {
+  FaThumbsUp,
+  FaEye,
+  FaBolt,
+  FaFire,
+  FaStar,
+  FaCheckCircle,
+  FaLink,
+} from "react-icons/fa";
 
 const EventPage = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [popupImage, setPopupImage] = useState(null); // for image popup
+  const [popupImage, setPopupImage] = useState(null);
+  const { darkMode } = useDarkMode(); // ⬅️ get darkMode state
 
   // Fetch events
   const fetchEvents = async () => {
     try {
-      const res = await fetch("https://cryptonewsbackend.up.railway.app/api/events");
+      const res = await fetch(
+        "https://cryptonewsbackend.up.railway.app/api/events"
+      );
       const data = await res.json();
       setEvents(data.events?.slice(0, 12) || []);
     } catch (error) {
@@ -1524,23 +2243,40 @@ const EventPage = () => {
     <>
       <Navbar />
 
-      <section className="max-w-screen-2xl mx-auto p-6">
-        <h2 className="text-3xl font-bold mb-6 text-center text-white dark:text-black">
+      <section
+        className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
+          darkMode ? "bg-gray-900" : "bg-white"
+        }`}
+      >
+        <h2
+          className={`text-3xl font-bold mb-8 text-center ${
+            darkMode ? "text-white" : "text-gray-900"
+          }`}
+        >
           📢 Latest Crypto Events
         </h2>
 
+        {/* Events Grid */}
         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event) => (
             <div
               key={event.id}
-              className="bg-gray-800 dark:bg-gray-100 p-5 rounded-xl shadow-md hover:shadow-xl transition transform hover:scale-[1.02]"
+              className={`p-5 rounded-xl shadow-lg flex flex-col transition-transform transform hover:scale-[1.03] ${
+                darkMode
+                  ? "bg-gray-800 hover:bg-gray-700"
+                  : "bg-gray-100 hover:bg-gray-200"
+              }`}
             >
-              <h3 className="text-lg font-semibold text-white dark:text-black mb-2">
+              {/* Title */}
+              <h3 className={`${darkMode ? "text-white" : "text-gray-900"} text-lg font-bold mb-1`}>
                 {event.title || "No Title"}
               </h3>
 
-              <p className="text-xs text-gray-400 dark:text-gray-600 mb-2">
-                {event.date_event ? new Date(event.date_event).toLocaleString() : "No Date"}
+              {/* Date */}
+              <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-2`}>
+                {event.date_event
+                  ? new Date(event.date_event).toLocaleString()
+                  : "No Date"}
               </p>
 
               {/* Proof Image */}
@@ -1550,7 +2286,11 @@ const EventPage = () => {
                     src={event.proof}
                     alt="Event proof"
                     onClick={() => setPopupImage(event.proof)}
-                    className="w-full h-32 object-cover rounded-md hover:scale-105 transition-transform cursor-pointer"
+                    className={`w-full h-32 object-cover rounded-md cursor-pointer border transition-transform ${
+                      darkMode
+                        ? "border-gray-700 hover:scale-105"
+                        : "border-gray-300 hover:scale-105"
+                    }`}
                   />
                 </div>
               )}
@@ -1561,9 +2301,15 @@ const EventPage = () => {
                   {event.coins.map((c) => (
                     <span
                       key={c.coin_id}
-                      className="text-xs bg-blue-500 text-white px-2 py-1 rounded-full flex items-center gap-1"
+                      className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full flex items-center gap-1"
                     >
-                      {c.icon && <img src={c.icon} alt={c.symbol} className="w-4 h-4 rounded-full" />}
+                      {c.icon && (
+                        <img
+                          src={c.icon}
+                          alt={c.symbol}
+                          className="w-4 h-4 rounded-full"
+                        />
+                      )}
                       {c.symbol}
                     </span>
                   ))}
@@ -1576,7 +2322,7 @@ const EventPage = () => {
                   {event.categories.map((cat) => (
                     <span
                       key={cat.category_id}
-                      className="text-xs bg-green-500 text-white px-2 py-1 rounded-full"
+                      className="text-xs bg-green-600 text-white px-2 py-1 rounded-full"
                     >
                       {cat.name}
                     </span>
@@ -1584,18 +2330,21 @@ const EventPage = () => {
                 </div>
               )}
 
-              <p className="text-gray-300 dark:text-gray-700 text-sm mb-3">
-                {event.description ? event.description.slice(0, 120) + "..." : "No description available"}
+              {/* Description */}
+              <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm mb-3`}>
+                {event.description
+                  ? event.description.slice(0, 120) + "..."
+                  : "No description available"}
               </p>
 
-              <div className="flex justify-between items-center">
+              {/* Actions */}
+              <div className="flex justify-between items-center mt-auto">
                 <button
                   onClick={() => setSelectedEvent(event)}
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
                 >
                   Read More
                 </button>
-
                 {event.source && (
                   <a
                     href={event.source}
@@ -1603,7 +2352,7 @@ const EventPage = () => {
                     rel="noreferrer"
                     className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
                   >
-                    🌐 Visit Source
+                    <FaLink /> Verified Source
                   </a>
                 )}
               </div>
@@ -1614,32 +2363,44 @@ const EventPage = () => {
 
       {/* Event Modal */}
       {selectedEvent && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-          <div className="bg-gray-900 dark:bg-white max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-lg relative flex flex-col overflow-hidden">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+          <div
+            className={`max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-2xl flex flex-col overflow-hidden transition-colors duration-300 ${
+              darkMode ? "bg-gray-900" : "bg-white"
+            }`}
+          >
+            {/* Close Button */}
             <button
               onClick={() => setSelectedEvent(null)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-red-500 text-xl font-bold"
+              className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500 ${
+                darkMode ? "text-gray-400" : "text-gray-700"
+              }`}
             >
               ✖
             </button>
 
+            {/* Title & Date */}
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-white dark:text-black mb-1">
+              <h2 className={`${darkMode ? "text-white" : "text-gray-900"} text-2xl font-bold mb-1`}>
                 {selectedEvent.title}
               </h2>
-              <p className="text-xs text-gray-400 dark:text-gray-600">
-                {selectedEvent.date_event ? new Date(selectedEvent.date_event).toLocaleString() : "No Date"}
+              <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs`}>
+                {selectedEvent.date_event
+                  ? new Date(selectedEvent.date_event).toLocaleString()
+                  : "No Date"}
               </p>
             </div>
 
-            {/* Proof Image with Popup */}
+            {/* Proof Image */}
             {selectedEvent.proof && (
               <div className="mb-4 flex flex-col gap-2">
                 <img
                   src={selectedEvent.proof}
                   alt="Event proof"
                   onClick={() => setPopupImage(selectedEvent.proof)}
-                  className="w-full h-40 object-cover rounded-md hover:scale-105 transition-transform cursor-pointer"
+                  className={`w-full h-40 object-cover rounded-md cursor-pointer border transition-transform ${
+                    darkMode ? "border-gray-700 hover:scale-105" : "border-gray-300 hover:scale-105"
+                  }`}
                 />
                 {selectedEvent.source && (
                   <a
@@ -1654,21 +2415,33 @@ const EventPage = () => {
               </div>
             )}
 
-            {/* Description */}
-            <div className="flex-1 overflow-y-auto pr-2 scrollbar-hide mb-4">
-              <p className="text-gray-300 dark:text-gray-700 whitespace-pre-line text-sm leading-relaxed">
+            {/* Full Description */}
+            <div className="flex-1 overflow-y-auto pr-2 mb-4">
+              <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed whitespace-pre-line`}>
                 {selectedEvent.description || "No description available"}
               </p>
             </div>
 
             {/* Stats */}
-            <div className="text-sm text-gray-400 mb-4 flex flex-wrap gap-4 items-center">
-              <div className="flex items-center gap-1"><FaThumbsUp className="text-blue-500" /> {selectedEvent.votes}</div>
-              <div className="flex items-center gap-1"><FaEye className="text-green-500" /> {selectedEvent.views}</div>
-              <div className="flex items-center gap-1"><FaCheckCircle className="text-yellow-400" /> {selectedEvent.confidence}</div>
-              <div className="flex items-center gap-1"><FaBolt className="text-purple-500" /> {selectedEvent.trending_score}</div>
-              <div className="flex items-center gap-1"><FaFire className="text-red-500" /> {selectedEvent.popular_score}</div>
-              <div className="flex items-center gap-1"><FaStar className="text-orange-400" /> {selectedEvent.significant_score}</div>
+            <div className={`text-sm flex flex-wrap gap-4 items-center border-t pt-3 ${darkMode ? "text-gray-400 border-gray-700" : "text-gray-700 border-gray-300"}`}>
+              <div className="flex items-center gap-1">
+                <FaThumbsUp className="text-blue-500" /> {selectedEvent.votes}
+              </div>
+              <div className="flex items-center gap-1">
+                <FaEye className="text-green-500" /> {selectedEvent.views}
+              </div>
+              <div className="flex items-center gap-1">
+                <FaCheckCircle className="text-yellow-400" /> {selectedEvent.confidence}
+              </div>
+              <div className="flex items-center gap-1">
+                <FaBolt className="text-purple-500" /> {selectedEvent.trending_score}
+              </div>
+              <div className="flex items-center gap-1">
+                <FaFire className="text-red-500" /> {selectedEvent.popular_score}
+              </div>
+              <div className="flex items-center gap-1">
+                <FaStar className="text-orange-400" /> {selectedEvent.significant_score}
+              </div>
             </div>
           </div>
         </div>
@@ -1678,12 +2451,12 @@ const EventPage = () => {
       {popupImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
-          onClick={() => setPopupImage(null)} // close on background click
+          onClick={() => setPopupImage(null)}
         >
           <div className="relative max-w-4xl w-full p-4">
             <button
               onClick={() => setPopupImage(null)}
-              className="absolute top-2 right-2 text-white text-2xl font-bold hover:text-red-400"
+              className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
             >
               ✖
             </button>
