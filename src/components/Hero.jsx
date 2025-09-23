@@ -230,13 +230,533 @@
 
 // export default Hero;
 
+
+
+
+// import React, { useState, useEffect } from "react";
+// import { useDarkMode } from "../context/ThemeContext"; // Import context
+
+// const Hero = () => {
+//   const { darkMode } = useDarkMode(); // Get darkMode state
+//   const [slides, setSlides] = useState([]);
+//   const [currentIndex, setCurrentIndex] = useState(0);
+
+//   // Fetch top news
+//   const fetchTrendingNews = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://min-api.cryptocompare.com/data/v2/news/?lang=EN"
+//       );
+//       const data = await res.json();
+
+//       if (data && data.Data) {
+//         const now = Math.floor(Date.now() / 1000);
+//         const recentNews = data.Data.filter(
+//           (news) => now - news.published_on <= 3600
+//         );
+//         const sorted = recentNews.sort((a, b) => b.published_on - a.published_on);
+//         setSlides(sorted.slice(0, 5));
+//       }
+//     } catch (err) {
+//       console.error("Error fetching trending news:", err);
+//     }
+//   };
+//   useEffect(() => {
+//     fetchTrendingNews();
+//     const interval = setInterval(fetchTrendingNews, 120000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Auto slide
+//   useEffect(() => {
+//     const slideInterval = setInterval(() => {
+//       setCurrentIndex((prevIndex) =>
+//         slides.length ? (prevIndex === slides.length - 1 ? 0 : prevIndex + 1) : 0
+//       );
+//     }, 2000);
+
+//     return () => clearInterval(slideInterval);
+//   }, [slides]);
+
+//   if (slides.length === 0) {
+//     return (
+//       <section className="max-w-9xl mx-auto px-4 py-8">
+//         <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-center`}>
+//           Loading trending news...
+//         </p>
+//       </section>
+//     );
+//   }
+
+//   return (
+//     <>
+//       <section className="max-w-9xl mx-auto px-4 py-8 grid md:grid-cols-2 gap-6 items-center">
+//         {/* Left Content */}
+//         <div>
+//           <h2
+//             className={`text-3xl md:text-4xl font-bold ${
+//               darkMode ? "text-white" : "text-gray-900"
+//             }`}
+//           >
+//             {slides[currentIndex].title}
+//           </h2>
+//           <p
+//             className={`mt-2 ${
+//               darkMode ? "text-gray-300" : "text-gray-700"
+//             }`}
+//           >
+//             {slides[currentIndex].body.slice(0, 120)}...
+//           </p>
+//           <a
+//             href={slides[currentIndex].url}
+//             target="_blank"
+//             rel="noopener noreferrer"
+//             className={`mt-4 inline-block px-4 py-2 rounded font-medium transition ${
+//               darkMode
+//                 ? "bg-gray-100 text-black hover:bg-gray-200"
+//                 : "bg-gray-900 text-white hover:bg-gray-800"
+//             }`}
+//           >
+//             READ MORE
+//           </a>
+//         </div>
+
+//         {/* Right Image */}
+//         <div className="flex justify-center md:justify-end">
+//           <div className="w-full h-80 md:h-96 overflow-hidden rounded-xl shadow-lg">
+//             <img
+//               src={slides[currentIndex].imageurl || "/images/default-news.jpeg"}
+//               alt="Slide"
+//               className="w-full h-full object-cover transition-all duration-700"
+//             />
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* Dots Navigation */}
+//       <div className="flex justify-center mt-4 space-x-2">
+//         {slides.map((_, index) => (
+//           <button
+//             key={index}
+//             onClick={() => setCurrentIndex(index)}
+//             className={`w-3 h-3 rounded-full transition ${
+//               index === currentIndex
+//                 ? darkMode
+//                   ? "bg-gray-100"
+//                   : "bg-gray-900"
+//                 : darkMode
+//                 ? "bg-gray-500"
+//                 : "bg-gray-400"
+//             }`}
+//           ></button>
+//         ))}
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Hero;
+
+
+// Animated version with swipe animation using Framer Motion
+
+// import React, { useState, useEffect } from "react";
+// import { useDarkMode } from "../context/ThemeContext";
+// import { motion, AnimatePresence } from "framer-motion";
+
+// const swipeConfidenceThreshold = 10000;
+// const swipePower = (offset, velocity) => {
+//   return Math.abs(offset) * velocity;
+// };
+
+// const Hero = () => {
+//   const { darkMode } = useDarkMode();
+//   const [slides, setSlides] = useState([]);
+//   const [currentIndex, setCurrentIndex] = useState(0);
+//   const [direction, setDirection] = useState(0);
+
+//   // Fetch top news
+//   const fetchTrendingNews = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://min-api.cryptocompare.com/data/v2/news/?lang=EN"
+//       );
+//       const data = await res.json();
+
+//       if (data && data.Data) {
+//         const now = Math.floor(Date.now() / 1000);
+//         const recentNews = data.Data.filter(
+//           (news) => now - news.published_on <= 3600
+//         );
+//         const sorted = recentNews.sort((a, b) => b.published_on - a.published_on);
+//         setSlides(sorted.slice(0, 5));
+//       }
+//     } catch (err) {
+//       console.error("Error fetching trending news:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchTrendingNews();
+//     const interval = setInterval(fetchTrendingNews, 120000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Auto slide
+//   useEffect(() => {
+//     const slideInterval = setInterval(() => {
+//       paginate(1);
+//     }, 5000);
+//     return () => clearInterval(slideInterval);
+//   }, [slides]);
+
+//   const paginate = (newDirection) => {
+//     if (!slides.length) return;
+//     setDirection(newDirection);
+//     setCurrentIndex((prev) =>
+//       (prev + newDirection + slides.length) % slides.length
+//     );
+//   };
+
+//   if (slides.length === 0) {
+//     return (
+//       <section className="max-w-9xl mx-auto px-4 py-8">
+//         <p
+//           className={`${
+//             darkMode ? "text-gray-400" : "text-gray-600"
+//           } text-center`}
+//         >
+//           Loading trending news...
+//         </p>
+//       </section>
+//     );
+//   }
+
+//   // Variants for sweet slide
+//   const variants = {
+//     enter: (direction) => ({
+//       x: direction > 0 ? 300 : -300,
+//       opacity: 0,
+//     }),
+//     center: {
+//       zIndex: 1,
+//       x: 0,
+//       opacity: 1,
+//       transition: {
+//         x: { type: "spring", stiffness: 300, damping: 30 },
+//         opacity: { duration: 0.3 },
+//       },
+//     },
+//     exit: (direction) => ({
+//       zIndex: 0,
+//       x: direction < 0 ? 300 : -300,
+//       opacity: 0,
+//     }),
+//   };
+
+//   return (
+//     <>
+//       <section className="max-w-9xl mx-auto px-4 py-8 grid md:grid-cols-2 gap-6 items-center">
+//         {/* Left Content */}
+//         <div>
+//           <AnimatePresence mode="wait" custom={direction}>
+//             <motion.div
+//               key={slides[currentIndex].id}
+//               custom={direction}
+//               variants={variants}
+//               initial="enter"
+//               animate="center"
+//               exit="exit"
+//               drag="x"
+//               dragConstraints={{ left: 0, right: 0 }}
+//               dragElastic={1}
+//               onDragEnd={(e, { offset, velocity }) => {
+//                 const swipe = swipePower(offset.x, velocity.x);
+
+//                 if (swipe < -swipeConfidenceThreshold) {
+//                   paginate(1);
+//                 } else if (swipe > swipeConfidenceThreshold) {
+//                   paginate(-1);
+//                 }
+//               }}
+//             >
+//               <h2
+//                 className={`text-3xl md:text-4xl font-bold ${
+//                   darkMode ? "text-white" : "text-gray-900"
+//                 }`}
+//               >
+//                 {slides[currentIndex].title}
+//               </h2>
+//               <p
+//                 className={`mt-2 ${
+//                   darkMode ? "text-gray-300" : "text-gray-700"
+//                 }`}
+//               >
+//                 {slides[currentIndex].body.slice(0, 120)}...
+//               </p>
+//               <a
+//                 href={slides[currentIndex].url}
+//                 target="_blank"
+//                 rel="noopener noreferrer"
+//                 className={`mt-4 inline-block px-4 py-2 rounded font-medium transition ${
+//                   darkMode
+//                     ? "bg-gray-100 text-black hover:bg-gray-200"
+//                     : "bg-gray-900 text-white hover:bg-gray-800"
+//                 }`}
+//               >
+//                 READ MORE
+//               </a>
+//             </motion.div>
+//           </AnimatePresence>
+//         </div>
+
+//         {/* Right Image */}
+//         <div className="flex justify-center md:justify-end">
+//           <div className="w-full h-80 md:h-96 overflow-hidden rounded-xl shadow-lg">
+//             <AnimatePresence mode="wait" custom={direction}>
+//               <motion.img
+//                 key={slides[currentIndex].imageurl}
+//                 src={
+//                   slides[currentIndex].imageurl || "/images/default-news.jpeg"
+//                 }
+//                 alt="Slide"
+//                 custom={direction}
+//                 variants={variants}
+//                 initial="enter"
+//                 animate="center"
+//                 exit="exit"
+//                 transition={{ duration: 0.6 }}
+//                 drag="x"
+//                 dragConstraints={{ left: 0, right: 0 }}
+//                 dragElastic={1}
+//                 onDragEnd={(e, { offset, velocity }) => {
+//                   const swipe = swipePower(offset.x, velocity.x);
+
+//                   if (swipe < -swipeConfidenceThreshold) {
+//                     paginate(1);
+//                   } else if (swipe > swipeConfidenceThreshold) {
+//                     paginate(-1);
+//                   }
+//                 }}
+//                 className="w-full h-full object-cover"
+//               />
+//             </AnimatePresence>
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* Dots Navigation */}
+//       <div className="flex justify-center mt-4 space-x-2">
+//         {slides.map((_, index) => (
+//           <button
+//             key={index}
+//             onClick={() => {
+//               setDirection(index > currentIndex ? 1 : -1);
+//               setCurrentIndex(index);
+//             }}
+//             className={`w-3 h-3 rounded-full transition ${
+//               index === currentIndex
+//                 ? darkMode
+//                   ? "bg-gray-100"
+//                   : "bg-gray-900"
+//                 : darkMode
+//                 ? "bg-gray-500"
+//                 : "bg-gray-400"
+//             }`}
+//           ></button>
+//         ))}
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Hero;
+
+
+// Final Version with swipe animation and auto slide
+// import React, { useState, useEffect } from "react";
+// import { useDarkMode } from "../context/ThemeContext";
+// import { motion, AnimatePresence } from "framer-motion";
+
+// const Hero = () => {
+//   const { darkMode } = useDarkMode();
+//   const [slides, setSlides] = useState([]);
+//   const [currentIndex, setCurrentIndex] = useState(0);
+//   const [direction, setDirection] = useState(1); // for swipe direction
+
+//   // Fetch top news
+//   const fetchTrendingNews = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://min-api.cryptocompare.com/data/v2/news/?lang=EN"
+//       );
+//       const data = await res.json();
+
+//       if (data && data.Data) {
+//         const now = Math.floor(Date.now() / 1000);
+//         const recentNews = data.Data.filter(
+//           (news) => now - news.published_on <= 3600
+//         );
+//         const sorted = recentNews.sort((a, b) => b.published_on - a.published_on);
+//         setSlides(sorted.slice(0, 5));
+//       }
+//     } catch (err) {
+//       console.error("Error fetching trending news:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchTrendingNews();
+//     const interval = setInterval(fetchTrendingNews, 120000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Auto slide with swipe animation
+//   useEffect(() => {
+//     const slideInterval = setInterval(() => {
+//       setDirection(1);
+//       setCurrentIndex((prevIndex) =>
+//         slides.length ? (prevIndex === slides.length - 1 ? 0 : prevIndex + 1) : 0
+//       );
+//     }, 4000);
+
+//     return () => clearInterval(slideInterval);
+//   }, [slides]);
+
+//   if (slides.length === 0) {
+//     return (
+//       <section className="max-w-9xl mx-auto px-4 py-8">
+//         <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-center`}>
+//           Loading trending news...
+//         </p>
+//       </section>
+//     );
+//   }
+
+//   // Variants for swipe effect
+//   const variants = {
+//     enter: (direction) => ({
+//       x: direction > 0 ? 300 : -300,
+//       opacity: 0,
+//     }),
+//     center: {
+//       x: 0,
+//       opacity: 1,
+//     },
+//     exit: (direction) => ({
+//       x: direction > 0 ? -300 : 300,
+//       opacity: 0,
+//     }),
+//   };
+
+//   return (
+//     <>
+//       <section className="max-w-9xl mx-auto px-4 py-8 grid md:grid-cols-2 gap-6 items-center">
+//         {/* Left Content */}
+//         <div>
+//           <AnimatePresence mode="wait" custom={direction}>
+//             <motion.div
+//               key={slides[currentIndex].id}
+//               custom={direction}
+//               variants={variants}
+//               initial="enter"
+//               animate="center"
+//               exit="exit"
+//               transition={{ duration: 0.6 }}
+//             >
+//               <h2
+//                 className={`text-3xl md:text-4xl font-bold ${
+//                   darkMode ? "text-white" : "text-gray-900"
+//                 }`}
+//               >
+//                 {slides[currentIndex].title}
+//               </h2>
+//               <p
+//                 className={`mt-2 ${
+//                   darkMode ? "text-gray-300" : "text-gray-700"
+//                 }`}
+//               >
+//                 {slides[currentIndex].body.slice(0, 120)}...
+//               </p>
+//               <a
+//                 href={slides[currentIndex].url}
+//                 target="_blank"
+//                 rel="noopener noreferrer"
+//                 className={`mt-4 inline-block px-4 py-2 rounded font-medium transition ${
+//                   darkMode
+//                     ? "bg-gray-100 text-black hover:bg-gray-200"
+//                     : "bg-gray-900 text-white hover:bg-gray-800"
+//                 }`}
+//               >
+//                 READ MORE
+//               </a>
+//             </motion.div>
+//           </AnimatePresence>
+//         </div>
+
+//         {/* Right Image */}
+//         <div className="flex justify-center md:justify-end">
+//           <div className="w-full h-80 md:h-96 overflow-hidden rounded-xl shadow-lg">
+//             <AnimatePresence mode="wait" custom={direction}>
+//               <motion.img
+//                 key={slides[currentIndex].imageurl}
+//                 src={slides[currentIndex].imageurl || "/images/default-news.jpeg"}
+//                 alt="Slide"
+//                 custom={direction}
+//                 variants={variants}
+//                 initial="enter"
+//                 animate="center"
+//                 exit="exit"
+//                 transition={{ duration: 0.6 }}
+//                 className="w-full h-full object-cover"
+//               />
+//             </AnimatePresence>
+//           </div>
+//         </div>
+//       </section>
+
+//       {/* Dots Navigation */}
+//       <div className="flex justify-center mt-4 space-x-2">
+//         {slides.map((_, index) => (
+//           <button
+//             key={index}
+//             onClick={() => {
+//               setDirection(index > currentIndex ? 1 : -1);
+//               setCurrentIndex(index);
+//             }}
+//             className={`w-3 h-3 rounded-full transition ${
+//               index === currentIndex
+//                 ? darkMode
+//                   ? "bg-gray-100"
+//                   : "bg-gray-900"
+//                 : darkMode
+//                 ? "bg-gray-500"
+//                 : "bg-gray-400"
+//             }`}
+//           ></button>
+//         ))}
+//       </div>
+//     </>
+//   );
+// };
+
+// export default Hero;
+
+
+
 import React, { useState, useEffect } from "react";
-import { useDarkMode } from "../context/ThemeContext"; // Import context
+import { useDarkMode } from "../context/ThemeContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+
+const swipeConfidenceThreshold = 10000;
+const swipePower = (offset, velocity) => Math.abs(offset) * velocity;
 
 const Hero = () => {
-  const { darkMode } = useDarkMode(); // Get darkMode state
+  const { darkMode } = useDarkMode();
   const [slides, setSlides] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
 
   // Fetch top news
   const fetchTrendingNews = async () => {
@@ -258,6 +778,7 @@ const Hero = () => {
       console.error("Error fetching trending news:", err);
     }
   };
+
   useEffect(() => {
     fetchTrendingNews();
     const interval = setInterval(fetchTrendingNews, 120000);
@@ -267,67 +788,160 @@ const Hero = () => {
   // Auto slide
   useEffect(() => {
     const slideInterval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        slides.length ? (prevIndex === slides.length - 1 ? 0 : prevIndex + 1) : 0
-      );
-    }, 2000);
-
+      paginate(1);
+    }, 3000);
     return () => clearInterval(slideInterval);
   }, [slides]);
+
+  const paginate = (newDirection) => {
+    if (!slides.length) return;
+    setDirection(newDirection);
+    setCurrentIndex((prev) =>
+      (prev + newDirection + slides.length) % slides.length
+    );
+  };
 
   if (slides.length === 0) {
     return (
       <section className="max-w-9xl mx-auto px-4 py-8">
-        <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-center`}>
+        <p
+          className={`${
+            darkMode ? "text-gray-400" : "text-gray-600"
+          } text-center`}
+        >
           Loading trending news...
         </p>
       </section>
     );
   }
 
+  // Variants for sweet slide
+  const variants = {
+    enter: (direction) => ({
+      x: direction > 0 ? 300 : -300,
+      opacity: 0,
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+      transition: {
+        x: { type: "spring", stiffness: 300, damping: 30 },
+        opacity: { duration: 0.3 },
+      },
+    },
+    exit: (direction) => ({
+      zIndex: 0,
+      x: direction < 0 ? 300 : -300,
+      opacity: 0,
+    }),
+  };
+
   return (
     <>
-      <section className="max-w-9xl mx-auto px-4 py-8 grid md:grid-cols-2 gap-6 items-center">
+      <section className="relative max-w-9xl mx-auto px-4 py-8 grid md:grid-cols-2 gap-6 items-center">
+        {/* Left Arrow */}
+        <button
+          onClick={() => paginate(-1)}
+          className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition z-10"
+        >
+          <FaChevronLeft />
+        </button>
+
         {/* Left Content */}
         <div>
-          <h2
-            className={`text-3xl md:text-4xl font-bold ${
-              darkMode ? "text-white" : "text-gray-900"
-            }`}
-          >
-            {slides[currentIndex].title}
-          </h2>
-          <p
-            className={`mt-2 ${
-              darkMode ? "text-gray-300" : "text-gray-700"
-            }`}
-          >
-            {slides[currentIndex].body.slice(0, 120)}...
-          </p>
-          <a
-            href={slides[currentIndex].url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`mt-4 inline-block px-4 py-2 rounded font-medium transition ${
-              darkMode
-                ? "bg-gray-100 text-black hover:bg-gray-200"
-                : "bg-gray-900 text-white hover:bg-gray-800"
-            }`}
-          >
-            READ MORE
-          </a>
+          <AnimatePresence mode="wait" custom={direction}>
+            <motion.div
+              key={slides[currentIndex].id}
+              custom={direction}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={1}
+              onDragEnd={(e, { offset, velocity }) => {
+                const swipe = swipePower(offset.x, velocity.x);
+
+                if (swipe < -swipeConfidenceThreshold) {
+                  paginate(1);
+                } else if (swipe > swipeConfidenceThreshold) {
+                  paginate(-1);
+                }
+              }}
+            >
+              <h2
+                className={`text-3xl md:text-4xl font-bold ${
+                  darkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {slides[currentIndex].title}
+              </h2>
+              <p
+                className={`mt-2 ${
+                  darkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                {slides[currentIndex].body.slice(0, 120)}...
+              </p>
+              <a
+                href={slides[currentIndex].url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`mt-4 inline-block px-4 py-2 rounded font-medium transition ${
+                  darkMode
+                    ? "bg-gray-100 text-black hover:bg-gray-200"
+                    : "bg-gray-900 text-white hover:bg-gray-800"
+                }`}
+              >
+                READ MORE
+              </a>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* Right Image */}
-        <div className="flex justify-center md:justify-end">
+        {/* Right Content (Image) */}
+        <div className="flex justify-center md:justify-end relative">
           <div className="w-full h-80 md:h-96 overflow-hidden rounded-xl shadow-lg">
-            <img
-              src={slides[currentIndex].imageurl || "/images/default-news.jpeg"}
-              alt="Slide"
-              className="w-full h-full object-cover transition-all duration-700"
-            />
+            <AnimatePresence mode="wait" custom={direction}>
+              <motion.img
+                key={slides[currentIndex].imageurl}
+                src={
+                  slides[currentIndex].imageurl || "/images/default-news.jpeg"
+                }
+                alt="Slide"
+                custom={direction}
+                variants={variants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                transition={{ duration: 0.6 }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={1}
+                onDragEnd={(e, { offset, velocity }) => {
+                  const swipe = swipePower(offset.x, velocity.x);
+
+                  if (swipe < -swipeConfidenceThreshold) {
+                    paginate(1);
+                  } else if (swipe > swipeConfidenceThreshold) {
+                    paginate(-1);
+                  }
+                }}
+                className="w-full h-full object-cover"
+              />
+            </AnimatePresence>
           </div>
         </div>
+
+        {/* Right Arrow */}
+        <button
+          onClick={() => paginate(1)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition z-10"
+        >
+          <FaChevronRight />
+        </button>
       </section>
 
       {/* Dots Navigation */}
@@ -335,7 +949,10 @@ const Hero = () => {
         {slides.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => {
+              setDirection(index > currentIndex ? 1 : -1);
+              setCurrentIndex(index);
+            }}
             className={`w-3 h-3 rounded-full transition ${
               index === currentIndex
                 ? darkMode
@@ -353,9 +970,6 @@ const Hero = () => {
 };
 
 export default Hero;
-
-
-
 
 
 // animated ticker for trending crypto news horizontally scrolling
