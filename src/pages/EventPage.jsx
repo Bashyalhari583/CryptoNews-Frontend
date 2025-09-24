@@ -3903,6 +3903,576 @@
 
 
 
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { useDarkMode } from "../context/ThemeContext";
+// import { FaLink, FaSearch, FaChevronDown, FaChevronUp } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [selectedEvent, setSelectedEvent] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [categoryFilter, setCategoryFilter] = useState("All");
+//   const [sortConfig, setSortConfig] = useState({ key: "votes", direction: "desc" }); // Default leaderboard sort
+//   const { darkMode } = useDarkMode();
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000); // refresh every 60s
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Unique categories for filter
+//   const categories = [
+//     "All",
+//     ...new Set(events.flatMap((e) => e.categories?.map((cat) => cat.name) || [])),
+//   ];
+
+//   // Filter events by search & category
+//   let filteredEvents = events.filter((event) => {
+//     const matchesSearch =
+//       event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       event.description?.toLowerCase().includes(searchTerm.toLowerCase());
+//     const matchesCategory =
+//       categoryFilter === "All" ||
+//       event.categories?.some((cat) => cat.name === categoryFilter);
+//     return matchesSearch && matchesCategory;
+//   });
+
+//   // Sort events by sortConfig
+//   if (sortConfig.key) {
+//     filteredEvents.sort((a, b) => {
+//       const aValue = a[sortConfig.key] || 0;
+//       const bValue = b[sortConfig.key] || 0;
+//       if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+//       if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+//       return 0;
+//     });
+//   }
+
+//   // Handle sorting when header clicked
+//   const handleSort = (key) => {
+//     setSortConfig((prev) => ({
+//       key,
+//       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+//     }));
+//   };
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section
+//         className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
+//           darkMode ? "bg-gray-900" : "bg-white"
+//         }`}
+//       >
+//         <h2
+//           className={`text-3xl font-bold mb-6 text-center ${
+//             darkMode ? "text-white" : "text-gray-900"
+//           }`}
+//         >
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Search & Category Filter */}
+//         <div className="flex flex-col sm:flex-row gap-4 mb-4 items-center justify-between">
+//           <div className="relative w-full sm:w-1/2">
+//             <input
+//               type="text"
+//               placeholder="Search events..."
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//                 darkMode
+//                   ? "bg-gray-800 border-gray-700 text-white"
+//                   : "bg-white border-gray-300 text-gray-900"
+//               }`}
+//             />
+//             <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
+//           </div>
+
+//           <select
+//             value={categoryFilter}
+//             onChange={(e) => setCategoryFilter(e.target.value)}
+//             className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//               darkMode
+//                 ? "bg-gray-800 border-gray-700 text-white"
+//                 : "bg-white border-gray-300 text-gray-900"
+//             }`}
+//           >
+//             {categories.map((cat, idx) => (
+//               <option key={idx} value={cat}>
+//                 {cat}
+//               </option>
+//             ))}
+//           </select>
+//         </div>
+
+//         {/* Events Table */}
+//         <div className="overflow-x-auto rounded-lg shadow">
+//           <table className="min-w-full border-collapse">
+//             <thead
+//               className={`${
+//                 darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"
+//               }`}
+//             >
+//               <tr>
+//                 <th className="px-4 py-2 text-left">Event Name</th>
+//                 <th
+//                   className={`px-4 py-2 text-left cursor-pointer ${
+//                     sortConfig.key === "date_event" ? "underline" : ""
+//                   }`}
+//                   onClick={() => handleSort("date_event")}
+//                 >
+//                   Date{" "}
+//                   {sortConfig.key === "date_event" &&
+//                     (sortConfig.direction === "asc" ? (
+//                       <FaChevronUp className="inline" />
+//                     ) : (
+//                       <FaChevronDown className="inline" />
+//                     ))}
+//                 </th>
+//                 <th className="px-4 py-2 text-left">Categories</th>
+//                 <th className="px-4 py-2 text-left">Coins</th>
+//                 <th className="px-4 py-2 text-left">Proof</th>
+//                 <th
+//                   className={`px-4 py-2 text-left cursor-pointer ${
+//                     sortConfig.key === "votes" ? "underline" : ""
+//                   }`}
+//                   onClick={() => handleSort("votes")}
+//                 >
+//                   Votes{" "}
+//                   {sortConfig.key === "votes" &&
+//                     (sortConfig.direction === "asc" ? (
+//                       <FaChevronUp className="inline" />
+//                     ) : (
+//                       <FaChevronDown className="inline" />
+//                     ))}
+//                 </th>
+//                 <th
+//                   className={`px-4 py-2 text-left cursor-pointer ${
+//                     sortConfig.key === "trending_score" ? "underline" : ""
+//                   }`}
+//                   onClick={() => handleSort("trending_score")}
+//                 >
+//                   Trending{" "}
+//                   {sortConfig.key === "trending_score" &&
+//                     (sortConfig.direction === "asc" ? (
+//                       <FaChevronUp className="inline" />
+//                     ) : (
+//                       <FaChevronDown className="inline" />
+//                     ))}
+//                 </th>
+//                 <th className="px-4 py-2 text-left">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {filteredEvents.length > 0 ? (
+//                 filteredEvents.map((event) => (
+//                   <tr
+//                     key={event.id}
+//                     className={`border-t transition-colors cursor-pointer hover:${
+//                       darkMode ? "bg-gray-700" : "bg-gray-200"
+//                     }`}
+//                   >
+//                     <td className="px-4 py-2">{event.title || "No Title"}</td>
+//                     <td className="px-4 py-2">
+//                       {event.date_event
+//                         ? new Date(event.date_event).toLocaleString()
+//                         : "No Date"}
+//                     </td>
+//                     <td className="px-4 py-2">
+//                       {event.categories?.map((cat) => cat.name).join(", ") || "-"}
+//                     </td>
+//                     <td className="px-4 py-2">
+//                       {event.coins?.map((c) => c.symbol).join(", ") || "-"}
+//                     </td>
+//                     <td className="px-4 py-2">
+//                       {event.proof && (
+//                         <img
+//                           src={event.proof}
+//                           alt="proof"
+//                           onClick={() => setPopupImage(event.proof)}
+//                           className="w-16 h-16 object-cover rounded-md cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
+//                         />
+//                       )}
+//                     </td>
+//                     <td className="px-4 py-2">{event.votes}</td>
+//                     <td className="px-4 py-2">{event.trending_score}</td>
+//                     <td className="px-4 py-2 flex gap-2 items-center">
+//                       <button
+//                         onClick={() => setSelectedEvent(event)}
+//                         className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+//                       >
+//                         Read More
+//                       </button>
+//                       {event.source && (
+//                         <a
+//                           href={event.source}
+//                           target="_blank"
+//                           rel="noreferrer"
+//                           className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
+//                         >
+//                           <FaLink /> Source
+//                         </a>
+//                       )}
+//                     </td>
+//                   </tr>
+//                 ))
+//               ) : (
+//                 <tr>
+//                   <td colSpan="8" className="text-center py-4 text-gray-400">
+//                     No events found
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+
+//       {/* Event Modal & Proof Popup (same as previous version) */}
+//       {selectedEvent && (
+//         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+//           <div
+//             className={`max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-2xl flex flex-col overflow-hidden transition-colors duration-300 ${
+//               darkMode ? "bg-gray-900" : "bg-white"
+//             }`}
+//           >
+//             <button
+//               onClick={() => setSelectedEvent(null)}
+//               className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500 ${
+//                 darkMode ? "text-gray-400" : "text-gray-700"
+//               }`}
+//             >
+//               ✖
+//             </button>
+
+//             <h2
+//               className={`text-2xl font-bold mb-2 ${
+//                 darkMode ? "text-white" : "text-gray-900"
+//               }`}
+//             >
+//               {selectedEvent.title}
+//             </h2>
+//             <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-4`}>
+//               {selectedEvent.date_event
+//                 ? new Date(selectedEvent.date_event).toLocaleString()
+//                 : "No Date"}
+//             </p>
+
+//             {selectedEvent.proof && (
+//               <img
+//                 src={selectedEvent.proof}
+//                 alt="proof"
+//                 onClick={() => setPopupImage(selectedEvent.proof)}
+//                 className="w-full h-40 object-cover rounded-md cursor-pointer border mb-4"
+//               />
+//             )}
+
+//             <div className={`flex-1 overflow-y-auto text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+//               <p className="mb-2 whitespace-pre-line">{selectedEvent.description}</p>
+//               <p className="mb-2">
+//                 <strong>Categories:</strong>{" "}
+//                 {selectedEvent.categories?.map((c) => c.name).join(", ")}
+//               </p>
+//               <p className="mb-2">
+//                 <strong>Coins:</strong> {selectedEvent.coins?.map((c) => c.symbol).join(", ")}
+//               </p>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="proof full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
+
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { useDarkMode } from "../context/ThemeContext";
+// import { FaLink, FaSearch, FaChevronDown, FaChevronUp } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [selectedEvent, setSelectedEvent] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [categoryFilter, setCategoryFilter] = useState("All");
+//   const [sortConfig, setSortConfig] = useState({ key: "votes", direction: "desc" });
+//   const { darkMode } = useDarkMode();
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch("https://cryptonewsbackend.up.railway.app/api/events");
+//       const data = await res.json();
+//       setEvents(data.events || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Unique categories for filter
+//   const categories = ["All", ...new Set(events.flatMap((e) => e.categories?.map((cat) => cat.name) || []))];
+
+//   // Filter & search
+//   let filteredEvents = events.filter((event) => {
+//     const matchesSearch =
+//       event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       (event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+//     const matchesCategory =
+//       categoryFilter === "All" || event.categories?.some((cat) => cat.name === categoryFilter);
+//     return matchesSearch && matchesCategory;
+//   });
+
+//   // Sorting
+//   if (sortConfig.key) {
+//     filteredEvents.sort((a, b) => {
+//       const aValue = a[sortConfig.key] || 0;
+//       const bValue = b[sortConfig.key] || 0;
+//       if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+//       if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+//       return 0;
+//     });
+//   }
+
+//   const handleSort = (key) => {
+//     setSortConfig((prev) => ({
+//       key,
+//       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+//     }));
+//   };
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-white"}`}>
+//         <h2 className={`text-3xl font-bold mb-6 text-center ${darkMode ? "text-white" : "text-gray-900"}`}>
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Search & Filter */}
+//         <div className="flex flex-col sm:flex-row gap-4 mb-4 items-center justify-between">
+//           <div className="relative w-full sm:w-1/2">
+//             <input
+//               type="text"
+//               placeholder="Search events..."
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//                 darkMode ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-300 text-gray-900"
+//               }`}
+//             />
+//             <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
+//           </div>
+
+//           <select
+//             value={categoryFilter}
+//             onChange={(e) => setCategoryFilter(e.target.value)}
+//             className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//               darkMode ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-300 text-gray-900"
+//             }`}
+//           >
+//             {categories.map((cat, idx) => (
+//               <option key={idx} value={cat}>
+//                 {cat}
+//               </option>
+//             ))}
+//           </select>
+//         </div>
+
+//         {/* Table */}
+//         <div className="overflow-x-auto rounded-lg shadow">
+//           <table className="min-w-full border-collapse">
+//             <thead className={`${darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"}`}>
+//               <tr>
+//                 <th className="px-4 py-2 text-left">Event Name</th>
+//                 <th className="px-4 py-2 text-left cursor-pointer" onClick={() => handleSort("date_event")}>
+//                   Date {sortConfig.key === "date_event" ? (sortConfig.direction === "asc" ? <FaChevronUp className="inline" /> : <FaChevronDown className="inline" />) : null}
+//                 </th>
+//                 <th className="px-4 py-2 text-left">Categories</th>
+//                 <th className="px-4 py-2 text-left">Coins</th>
+//                 <th className="px-4 py-2 text-left">Proof</th>
+//                 <th className="px-4 py-2 text-left cursor-pointer" onClick={() => handleSort("votes")}>
+//                   Votes {sortConfig.key === "votes" ? (sortConfig.direction === "asc" ? <FaChevronUp className="inline" /> : <FaChevronDown className="inline" />) : null}
+//                 </th>
+//                 <th className="px-4 py-2 text-left cursor-pointer" onClick={() => handleSort("trending_score")}>
+//                   Trending {sortConfig.key === "trending_score" ? (sortConfig.direction === "asc" ? <FaChevronUp className="inline" /> : <FaChevronDown className="inline" />) : null}
+//                 </th>
+//                 <th className="px-4 py-2 text-left">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody className={`${darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"}`}>
+//               {filteredEvents.length > 0 ? (
+//                 filteredEvents.map((event) => (
+//                   <tr
+//                     key={event.id}
+//                     className={`border-t transition-colors cursor-pointer ${darkMode ? "hover:bg-gray-700" : "hover:bg-gray-200"}`}
+//                   >
+//                     <td className="px-4 py-2">{event.title || "No Title"}</td>
+//                     <td className="px-4 py-2">{event.date_event ? new Date(event.date_event).toLocaleString() : "No Date"}</td>
+//                     <td className="px-4 py-2">{event.categories?.map((c) => c.name).join(", ") || "-"}</td>
+//                     <td className="px-4 py-2">{event.coins?.map((c) => c.symbol).join(", ") || "-"}</td>
+//                     <td className="px-4 py-2">
+//                       {event.proof && (
+//                         <img
+//                           src={event.proof}
+//                           alt="proof"
+//                           onClick={() => setPopupImage(event.proof)}
+//                           className="w-16 h-16 object-cover rounded-md cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
+//                         />
+//                       )}
+//                     </td>
+//                     <td className="px-4 py-2">{event.votes}</td>
+//                     <td className="px-4 py-2">{event.trending_score}</td>
+//                     <td className="px-4 py-2 flex gap-2 items-center">
+//                       <button
+//                         onClick={() => setSelectedEvent(event)}
+//                         className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+//                       >
+//                         Read More
+//                       </button>
+//                       {event.source && (
+//                         <a
+//                           href={event.source}
+//                           target="_blank"
+//                           rel="noreferrer"
+//                           className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
+//                         >
+//                           <FaLink /> Source
+//                         </a>
+//                       )}
+//                     </td>
+//                   </tr>
+//                 ))
+//               ) : (
+//                 <tr>
+//                   <td colSpan="8" className="text-center py-4 text-gray-400">
+//                     No events found
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+
+//       {/* Event Modal */}
+//       {selectedEvent && (
+//         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+//           <div
+//             className={`max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-2xl flex flex-col overflow-hidden transition-colors duration-300 ${
+//               darkMode ? "bg-gray-900" : "bg-white"
+//             }`}
+//           >
+//             <button
+//               onClick={() => setSelectedEvent(null)}
+//               className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500 ${
+//                 darkMode ? "text-gray-400" : "text-gray-700"
+//               }`}
+//             >
+//               ✖
+//             </button>
+
+//             <h2 className={`text-2xl font-bold mb-2 ${darkMode ? "text-white" : "text-gray-900"}`}>
+//               {selectedEvent.title}
+//             </h2>
+//             <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-4`}>
+//               {selectedEvent.date_event ? new Date(selectedEvent.date_event).toLocaleString() : "No Date"}
+//             </p>
+
+//             {selectedEvent.proof && (
+//               <img
+//                 src={selectedEvent.proof}
+//                 alt="proof"
+//                 onClick={() => setPopupImage(selectedEvent.proof)}
+//                 className="w-full h-40 object-cover rounded-md cursor-pointer border mb-4"
+//               />
+//             )}
+
+//             <div className={`flex-1 overflow-y-auto text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+//               <p className="mb-2 whitespace-pre-line">
+//                 {selectedEvent.description || "Description not available on free plan"}
+//               </p>
+//               <p className="mb-2">
+//                 <strong>Categories:</strong> {selectedEvent.categories?.map((c) => c.name).join(", ") || "-"}
+//               </p>
+//               <p className="mb-2">
+//                 <strong>Coins:</strong> {selectedEvent.coins?.map((c) => c.symbol).join(", ") || "-"}
+//               </p>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Image Popup */}
+//       {popupImage && (
+//         <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]" onClick={() => setPopupImage(null)}>
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img src={popupImage} alt="proof full" className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg" />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useDarkMode } from "../context/ThemeContext";
@@ -3914,15 +4484,13 @@ const EventPage = () => {
   const [popupImage, setPopupImage] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
-  const [sortConfig, setSortConfig] = useState({ key: "votes", direction: "desc" }); // Default leaderboard sort
+  const [sortConfig, setSortConfig] = useState({ key: "votes", direction: "desc" });
   const { darkMode } = useDarkMode();
 
   // Fetch events
   const fetchEvents = async () => {
     try {
-      const res = await fetch(
-        "https://cryptonewsbackend.up.railway.app/api/events"
-      );
+      const res = await fetch("https://cryptonewsbackend.up.railway.app/api/events");
       const data = await res.json();
       setEvents(data.events || []);
     } catch (error) {
@@ -3932,30 +4500,26 @@ const EventPage = () => {
 
   useEffect(() => {
     fetchEvents();
-    const interval = setInterval(fetchEvents, 60000); // refresh every 60s
+    const interval = setInterval(fetchEvents, 60000);
     return () => clearInterval(interval);
   }, []);
 
-  // Unique categories for filter
-  const categories = [
-    "All",
-    ...new Set(events.flatMap((e) => e.categories?.map((cat) => cat.name) || [])),
-  ];
+  // Unique categories
+  const categories = ["All", ...new Set(events.flatMap((e) => e.categories?.map((cat) => cat.name) || []))];
 
-  // Filter events by search & category
+  // Filter & search
   let filteredEvents = events.filter((event) => {
     const matchesSearch =
       event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      event.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      (event.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
     const matchesCategory =
-      categoryFilter === "All" ||
-      event.categories?.some((cat) => cat.name === categoryFilter);
+      categoryFilter === "All" || event.categories?.some((cat) => cat.name === categoryFilter);
     return matchesSearch && matchesCategory;
   });
 
-  // Sort events by sortConfig
+  // Sorting
   if (sortConfig.key) {
-    filteredEvents.sort((a, b) => {
+    filteredEvents = [...filteredEvents].sort((a, b) => {
       const aValue = a[sortConfig.key] || 0;
       const bValue = b[sortConfig.key] || 0;
       if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
@@ -3964,7 +4528,6 @@ const EventPage = () => {
     });
   }
 
-  // Handle sorting when header clicked
   const handleSort = (key) => {
     setSortConfig((prev) => ({
       key,
@@ -3976,20 +4539,12 @@ const EventPage = () => {
     <>
       <Navbar />
 
-      <section
-        className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
-          darkMode ? "bg-gray-900" : "bg-white"
-        }`}
-      >
-        <h2
-          className={`text-3xl font-bold mb-6 text-center ${
-            darkMode ? "text-white" : "text-gray-900"
-          }`}
-        >
+      <section className={`pt-20 max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${darkMode ? "bg-gray-900" : "bg-white"}`}>
+        <h2 className={`text-3xl font-bold mb-6 text-center ${darkMode ? "text-white" : "text-gray-900"}`}>
           📢 Latest Crypto Events
         </h2>
 
-        {/* Search & Category Filter */}
+        {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-4 mb-4 items-center justify-between">
           <div className="relative w-full sm:w-1/2">
             <input
@@ -3998,9 +4553,7 @@ const EventPage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
-                darkMode
-                  ? "bg-gray-800 border-gray-700 text-white"
-                  : "bg-white border-gray-300 text-gray-900"
+                darkMode ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-300 text-gray-900"
               }`}
             />
             <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
@@ -4010,73 +4563,34 @@ const EventPage = () => {
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
-              darkMode
-                ? "bg-gray-800 border-gray-700 text-white"
-                : "bg-white border-gray-300 text-gray-900"
+              darkMode ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-300 text-gray-900"
             }`}
           >
-            {categories.map((cat, idx) => (
-              <option key={idx} value={cat}>
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
                 {cat}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Events Table */}
+        {/* Table */}
         <div className="overflow-x-auto rounded-lg shadow">
           <table className="min-w-full border-collapse">
-            <thead
-              className={`${
-                darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"
-              }`}
-            >
+            <thead className={`${darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"}`}>
               <tr>
                 <th className="px-4 py-2 text-left">Event Name</th>
-                <th
-                  className={`px-4 py-2 text-left cursor-pointer ${
-                    sortConfig.key === "date_event" ? "underline" : ""
-                  }`}
-                  onClick={() => handleSort("date_event")}
-                >
-                  Date{" "}
-                  {sortConfig.key === "date_event" &&
-                    (sortConfig.direction === "asc" ? (
-                      <FaChevronUp className="inline" />
-                    ) : (
-                      <FaChevronDown className="inline" />
-                    ))}
+                <th className="px-4 py-2 text-left cursor-pointer" onClick={() => handleSort("date_event")}>
+                  Date {sortConfig.key === "date_event" ? (sortConfig.direction === "asc" ? <FaChevronUp className="inline" /> : <FaChevronDown className="inline" />) : null}
                 </th>
                 <th className="px-4 py-2 text-left">Categories</th>
                 <th className="px-4 py-2 text-left">Coins</th>
                 <th className="px-4 py-2 text-left">Proof</th>
-                <th
-                  className={`px-4 py-2 text-left cursor-pointer ${
-                    sortConfig.key === "votes" ? "underline" : ""
-                  }`}
-                  onClick={() => handleSort("votes")}
-                >
-                  Votes{" "}
-                  {sortConfig.key === "votes" &&
-                    (sortConfig.direction === "asc" ? (
-                      <FaChevronUp className="inline" />
-                    ) : (
-                      <FaChevronDown className="inline" />
-                    ))}
+                <th className="px-4 py-2 text-left cursor-pointer" onClick={() => handleSort("votes")}>
+                  Votes {sortConfig.key === "votes" ? (sortConfig.direction === "asc" ? <FaChevronUp className="inline" /> : <FaChevronDown className="inline" />) : null}
                 </th>
-                <th
-                  className={`px-4 py-2 text-left cursor-pointer ${
-                    sortConfig.key === "trending_score" ? "underline" : ""
-                  }`}
-                  onClick={() => handleSort("trending_score")}
-                >
-                  Trending{" "}
-                  {sortConfig.key === "trending_score" &&
-                    (sortConfig.direction === "asc" ? (
-                      <FaChevronUp className="inline" />
-                    ) : (
-                      <FaChevronDown className="inline" />
-                    ))}
+                <th className="px-4 py-2 text-left cursor-pointer" onClick={() => handleSort("trending_score")}>
+                  Trending {sortConfig.key === "trending_score" ? (sortConfig.direction === "asc" ? <FaChevronUp className="inline" /> : <FaChevronDown className="inline" />) : null}
                 </th>
                 <th className="px-4 py-2 text-left">Actions</th>
               </tr>
@@ -4086,22 +4600,14 @@ const EventPage = () => {
                 filteredEvents.map((event) => (
                   <tr
                     key={event.id}
-                    className={`border-t transition-colors cursor-pointer hover:${
-                      darkMode ? "bg-gray-700" : "bg-gray-200"
+                    className={`border-t transition-colors cursor-pointer ${
+                      darkMode ? "hover:bg-gray-700 text-gray-300" : "hover:bg-gray-200 text-gray-900"
                     }`}
                   >
                     <td className="px-4 py-2">{event.title || "No Title"}</td>
-                    <td className="px-4 py-2">
-                      {event.date_event
-                        ? new Date(event.date_event).toLocaleString()
-                        : "No Date"}
-                    </td>
-                    <td className="px-4 py-2">
-                      {event.categories?.map((cat) => cat.name).join(", ") || "-"}
-                    </td>
-                    <td className="px-4 py-2">
-                      {event.coins?.map((c) => c.symbol).join(", ") || "-"}
-                    </td>
+                    <td className="px-4 py-2">{event.date_event ? new Date(event.date_event).toLocaleString() : "No Date"}</td>
+                    <td className="px-4 py-2">{event.categories?.map((c) => c.name).join(", ") || "-"}</td>
+                    <td className="px-4 py-2">{event.coins?.map((c) => c.symbol).join(", ") || "-"}</td>
                     <td className="px-4 py-2">
                       {event.proof && (
                         <img
@@ -4136,7 +4642,7 @@ const EventPage = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center py-4 text-gray-400">
+                  <td colSpan="8" className={`text-center py-4 ${darkMode ? "text-gray-400" : "text-gray-500"}`}>
                     No events found
                   </td>
                 </tr>
@@ -4146,35 +4652,23 @@ const EventPage = () => {
         </div>
       </section>
 
-      {/* Event Modal & Proof Popup (same as previous version) */}
+      {/* Event Modal */}
       {selectedEvent && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
           <div
             className={`max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-2xl flex flex-col overflow-hidden transition-colors duration-300 ${
-              darkMode ? "bg-gray-900" : "bg-white"
+              darkMode ? "bg-gray-900 text-gray-300" : "bg-white text-gray-900"
             }`}
           >
             <button
               onClick={() => setSelectedEvent(null)}
-              className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500 ${
-                darkMode ? "text-gray-400" : "text-gray-700"
-              }`}
+              className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500`}
             >
               ✖
             </button>
 
-            <h2
-              className={`text-2xl font-bold mb-2 ${
-                darkMode ? "text-white" : "text-gray-900"
-              }`}
-            >
-              {selectedEvent.title}
-            </h2>
-            <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-4`}>
-              {selectedEvent.date_event
-                ? new Date(selectedEvent.date_event).toLocaleString()
-                : "No Date"}
-            </p>
+            <h2 className="text-2xl font-bold mb-2">{selectedEvent.title}</h2>
+            <p className="text-xs mb-4">{selectedEvent.date_event ? new Date(selectedEvent.date_event).toLocaleString() : "No Date"}</p>
 
             {selectedEvent.proof && (
               <img
@@ -4185,25 +4679,22 @@ const EventPage = () => {
               />
             )}
 
-            <div className={`flex-1 overflow-y-auto text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
-              <p className="mb-2 whitespace-pre-line">{selectedEvent.description}</p>
+            <div className="flex-1 overflow-y-auto text-sm">
+              <p className="mb-2 whitespace-pre-line">{selectedEvent.description || "Description not available"}</p>
               <p className="mb-2">
-                <strong>Categories:</strong>{" "}
-                {selectedEvent.categories?.map((c) => c.name).join(", ")}
+                <strong>Categories:</strong> {selectedEvent.categories?.map((c) => c.name).join(", ") || "-"}
               </p>
               <p className="mb-2">
-                <strong>Coins:</strong> {selectedEvent.coins?.map((c) => c.symbol).join(", ")}
+                <strong>Coins:</strong> {selectedEvent.coins?.map((c) => c.symbol).join(", ") || "-"}
               </p>
             </div>
           </div>
         </div>
       )}
 
+      {/* Image Popup */}
       {popupImage && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
-          onClick={() => setPopupImage(null)}
-        >
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]" onClick={() => setPopupImage(null)}>
           <div className="relative max-w-4xl w-full p-4">
             <button
               onClick={() => setPopupImage(null)}
@@ -4211,11 +4702,7 @@ const EventPage = () => {
             >
               ✖
             </button>
-            <img
-              src={popupImage}
-              alt="proof full"
-              className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
-            />
+            <img src={popupImage} alt="proof full" className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg" />
           </div>
         </div>
       )}
