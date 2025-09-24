@@ -2200,25 +2200,1722 @@
 
 // export default EventPage;
 
+ // ================================ Dark Mode Version ================================ and box formatting events
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { useDarkMode } from "../context/ThemeContext";
+// import {
+//   FaThumbsUp,
+//   FaEye,
+//   FaBolt,
+//   FaFire,
+//   FaStar,
+//   FaCheckCircle,
+//   FaLink,
+// } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [selectedEvent, setSelectedEvent] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+//   const { darkMode } = useDarkMode(); // ⬅️ get darkMode state
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events?.slice(0, 12) || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section
+//         className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
+//           darkMode ? "bg-gray-900" : "bg-white"
+//         }`}
+//       >
+//         <h2
+//           className={`text-3xl font-bold mb-8 text-center ${
+//             darkMode ? "text-white" : "text-gray-900"
+//           }`}
+//         >
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Events Grid */}
+//         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+//           {events.map((event) => (
+//             <div
+//               key={event.id}
+//               className={`p-5 rounded-xl shadow-lg flex flex-col transition-transform transform hover:scale-[1.03] ${
+//                 darkMode
+//                   ? "bg-gray-800 hover:bg-gray-700"
+//                   : "bg-gray-100 hover:bg-gray-200"
+//               }`}
+//             >
+//               {/* Title */}
+//               <h3 className={`${darkMode ? "text-white" : "text-gray-900"} text-lg font-bold mb-1`}>
+//                 {event.title || "No Title"}
+//               </h3>
+
+//               {/* Date */}
+//               <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-2`}>
+//                 {event.date_event
+//                   ? new Date(event.date_event).toLocaleString()
+//                   : "No Date"}
+//               </p>
+
+//               {/* Proof Image */}
+//               {event.proof && (
+//                 <div className="mb-3">
+//                   <img
+//                     src={event.proof}
+//                     alt="Event proof"
+//                     onClick={() => setPopupImage(event.proof)}
+//                     className={`w-full h-32 object-cover rounded-md cursor-pointer border transition-transform ${
+//                       darkMode
+//                         ? "border-gray-700 hover:scale-105"
+//                         : "border-gray-300 hover:scale-105"
+//                     }`}
+//                   />
+//                 </div>
+//               )}
+
+//               {/* Coins */}
+//               {event.coins?.length > 0 && (
+//                 <div className="flex flex-wrap gap-1 mb-2">
+//                   {event.coins.map((c) => (
+//                     <span
+//                       key={c.coin_id}
+//                       className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full flex items-center gap-1"
+//                     >
+//                       {c.icon && (
+//                         <img
+//                           src={c.icon}
+//                           alt={c.symbol}
+//                           className="w-4 h-4 rounded-full"
+//                         />
+//                       )}
+//                       {c.symbol}
+//                     </span>
+//                   ))}
+//                 </div>
+//               )}
+
+//               {/* Categories */}
+//               {event.categories?.length > 0 && (
+//                 <div className="flex flex-wrap gap-1 mb-2">
+//                   {event.categories.map((cat) => (
+//                     <span
+//                       key={cat.category_id}
+//                       className="text-xs bg-green-600 text-white px-2 py-1 rounded-full"
+//                     >
+//                       {cat.name}
+//                     </span>
+//                   ))}
+//                 </div>
+//               )}
+
+//               {/* Description */}
+//               <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm mb-3`}>
+//                 {event.description
+//                   ? event.description.slice(0, 120) + "..."
+//                   : "No description available"}
+//               </p>
+
+//               {/* Actions */}
+//               <div className="flex justify-between items-center mt-auto">
+//                 <button
+//                   onClick={() => setSelectedEvent(event)}
+//                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
+//                 >
+//                   Read More
+//                 </button>
+//                 {event.source && (
+//                   <a
+//                     href={event.source}
+//                     target="_blank"
+//                     rel="noreferrer"
+//                     className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
+//                   >
+//                     <FaLink /> Verified Source
+//                   </a>
+//                 )}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </section>
+
+//       {/* Event Modal */}
+//       {selectedEvent && (
+//         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+//           <div
+//             className={`max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-2xl flex flex-col overflow-hidden transition-colors duration-300 ${
+//               darkMode ? "bg-gray-900" : "bg-white"
+//             }`}
+//           >
+//             {/* Close Button */}
+//             <button
+//               onClick={() => setSelectedEvent(null)}
+//               className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500 ${
+//                 darkMode ? "text-gray-400" : "text-gray-700"
+//               }`}
+//             >
+//               ✖
+//             </button>
+
+//             {/* Title & Date */}
+//             <div className="mb-4">
+//               <h2 className={`${darkMode ? "text-white" : "text-gray-900"} text-2xl font-bold mb-1`}>
+//                 {selectedEvent.title}
+//               </h2>
+//               <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs`}>
+//                 {selectedEvent.date_event
+//                   ? new Date(selectedEvent.date_event).toLocaleString()
+//                   : "No Date"}
+//               </p>
+//             </div>
+
+//             {/* Proof Image */}
+//             {selectedEvent.proof && (
+//               <div className="mb-4 flex flex-col gap-2">
+//                 <img
+//                   src={selectedEvent.proof}
+//                   alt="Event proof"
+//                   onClick={() => setPopupImage(selectedEvent.proof)}
+//                   className={`w-full h-40 object-cover rounded-md cursor-pointer border transition-transform ${
+//                     darkMode ? "border-gray-700 hover:scale-105" : "border-gray-300 hover:scale-105"
+//                   }`}
+//                 />
+//                 {selectedEvent.source && (
+//                   <a
+//                     href={selectedEvent.source}
+//                     target="_blank"
+//                     rel="noreferrer"
+//                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm text-center"
+//                   >
+//                     🌐 Official Post
+//                   </a>
+//                 )}
+//               </div>
+//             )}
+
+//             {/* Full Description */}
+//             <div className="flex-1 overflow-y-auto pr-2 mb-4">
+//               <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed whitespace-pre-line`}>
+//                 {selectedEvent.description || "No description available"}
+//               </p>
+//             </div>
+
+//             {/* Stats */}
+//             <div className={`text-sm flex flex-wrap gap-4 items-center border-t pt-3 ${darkMode ? "text-gray-400 border-gray-700" : "text-gray-700 border-gray-300"}`}>
+//               <div className="flex items-center gap-1">
+//                 <FaThumbsUp className="text-blue-500" /> {selectedEvent.votes}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaEye className="text-green-500" /> {selectedEvent.views}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaCheckCircle className="text-yellow-400" /> {selectedEvent.confidence}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaBolt className="text-purple-500" /> {selectedEvent.trending_score}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaFire className="text-red-500" /> {selectedEvent.popular_score}
+//               </div>
+//               <div className="flex items-center gap-1">
+//                 <FaStar className="text-orange-400" /> {selectedEvent.significant_score}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Proof Image Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="Proof Full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
+
+// ================================ Dark Mode Version with Table Layout ================================
+
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { useDarkMode } from "../context/ThemeContext";
+// import {
+//   FaThumbsUp,
+//   FaEye,
+//   FaBolt,
+//   FaFire,
+//   FaStar,
+//   FaCheckCircle,
+//   FaChevronDown,
+//   FaChevronUp,
+// } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [expandedRow, setExpandedRow] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+//   const { darkMode } = useDarkMode();
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events?.slice(0, 12) || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section
+//         className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
+//           darkMode ? "bg-gray-900" : "bg-white"
+//         }`}
+//       >
+//         <h2
+//           className={`text-3xl font-bold mb-8 text-center ${
+//             darkMode ? "text-white" : "text-gray-900"
+//           }`}
+//         >
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Events Table */}
+//         <div className="overflow-x-auto rounded-xl shadow-lg">
+//           <table
+//             className={`w-full border-collapse ${
+//               darkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-900"
+//             }`}
+//           >
+//             <thead>
+//               <tr
+//                 className={`${
+//                   darkMode ? "bg-gray-700 text-gray-200" : "bg-gray-100"
+//                 } text-left`}
+//               >
+//                 <th className="p-3 text-sm font-semibold">Event Name</th>
+//                 <th className="p-3 text-sm font-semibold">Date</th>
+//                 <th className="p-3 text-sm font-semibold">Category</th>
+//                 <th className="p-3 text-sm font-semibold">Proof</th>
+//                 <th className="p-3 text-sm font-semibold">Details</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {events.map((event, index) => (
+//                 <>
+//                   <tr
+//                     key={event.id}
+//                     className={`border-b ${
+//                       darkMode ? "border-gray-700" : "border-gray-200"
+//                     } hover:bg-blue-50/10`}
+//                   >
+//                     {/* Event Name */}
+//                     <td className="p-3 text-sm font-medium">
+//                       {event.title || "No Title"}
+//                     </td>
+
+//                     {/* Date */}
+//                     <td className="p-3 text-xs">
+//                       {event.date_event
+//                         ? new Date(event.date_event).toLocaleString()
+//                         : "No Date"}
+//                     </td>
+
+//                     {/* Categories */}
+//                     <td className="p-3 text-xs">
+//                       {event.categories?.length > 0 ? (
+//                         <div className="flex flex-wrap gap-1">
+//                           {event.categories.map((cat) => (
+//                             <span
+//                               key={cat.category_id}
+//                               className="bg-green-600 text-white px-2 py-1 rounded-full text-xs"
+//                             >
+//                               {cat.name}
+//                             </span>
+//                           ))}
+//                         </div>
+//                       ) : (
+//                         "-"
+//                       )}
+//                     </td>
+
+//                     {/* Proof Image */}
+//                     <td className="p-3">
+//                       {event.proof ? (
+//                         <img
+//                           src={event.proof}
+//                           alt="Proof"
+//                           onClick={() => setPopupImage(event.proof)}
+//                           className="w-12 h-12 rounded-lg object-cover border cursor-pointer hover:scale-105 transition-transform"
+//                         />
+//                       ) : (
+//                         "-"
+//                       )}
+//                     </td>
+
+//                     {/* Details Expand Button */}
+//                     <td className="p-3 text-center">
+//                       <button
+//                         onClick={() =>
+//                           setExpandedRow(expandedRow === index ? null : index)
+//                         }
+//                         className="flex items-center gap-1 px-3 py-1 rounded-lg text-sm bg-blue-600 text-white hover:bg-blue-700 transition"
+//                       >
+//                         {expandedRow === index ? (
+//                           <>
+//                             Hide <FaChevronUp />
+//                           </>
+//                         ) : (
+//                           <>
+//                             More <FaChevronDown />
+//                           </>
+//                         )}
+//                       </button>
+//                     </td>
+//                   </tr>
+
+//                   {/* Expanded Row */}
+//                   {expandedRow === index && (
+//                     <tr>
+//                       <td colSpan="5" className="p-4">
+//                         <div
+//                           className={`rounded-lg p-4 shadow-inner ${
+//                             darkMode ? "bg-gray-700" : "bg-gray-50"
+//                           }`}
+//                         >
+//                           {/* Description */}
+//                           <p
+//                             className={`mb-3 text-sm ${
+//                               darkMode ? "text-gray-300" : "text-gray-700"
+//                             }`}
+//                           >
+//                             {event.description ||
+//                               "No description available for this event."}
+//                           </p>
+
+//                           {/* Coins */}
+//                           {event.coins?.length > 0 && (
+//                             <div className="flex flex-wrap gap-2 mb-3">
+//                               {event.coins.map((c) => (
+//                                 <span
+//                                   key={c.coin_id}
+//                                   className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1"
+//                                 >
+//                                   {c.icon && (
+//                                     <img
+//                                       src={c.icon}
+//                                       alt={c.symbol}
+//                                       className="w-4 h-4 rounded-full"
+//                                     />
+//                                   )}
+//                                   {c.symbol}
+//                                 </span>
+//                               ))}
+//                             </div>
+//                           )}
+
+//                           {/* Stats */}
+//                           <div
+//                             className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-sm ${
+//                               darkMode ? "text-gray-200" : "text-gray-700"
+//                             }`}
+//                           >
+//                             <div className="flex items-center gap-1">
+//                               <FaThumbsUp className="text-blue-500" />{" "}
+//                               {event.votes}
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <FaEye className="text-green-500" />{" "}
+//                               {event.views}
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <FaCheckCircle className="text-yellow-400" />{" "}
+//                               {event.confidence}
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <FaBolt className="text-purple-500" />{" "}
+//                               {event.trending_score}
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <FaFire className="text-red-500" />{" "}
+//                               {event.popular_score}
+//                             </div>
+//                             <div className="flex items-center gap-1">
+//                               <FaStar className="text-orange-400" />{" "}
+//                               {event.significant_score}
+//                             </div>
+//                           </div>
+//                         </div>
+//                       </td>
+//                     </tr>
+//                   )}
+//                 </>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+
+//       {/* Proof Image Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="Proof Full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
+
+// ================================ Dark Mode Version with Table Layout + Search & Filter ================================
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { useDarkMode } from "../context/ThemeContext";
+// import {
+//   FaThumbsUp,
+//   FaEye,
+//   FaBolt,
+//   FaFire,
+//   FaStar,
+//   FaCheckCircle,
+//   FaChevronDown,
+//   FaChevronUp,
+//   FaSearch,
+// } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [expandedRow, setExpandedRow] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [categoryFilter, setCategoryFilter] = useState("All");
+//   const { darkMode } = useDarkMode();
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events?.slice(0, 50) || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Unique categories
+//   const categories = [
+//     "All",
+//     ...new Set(
+//       events.flatMap((e) => e.categories?.map((cat) => cat.name) || [])
+//     ),
+//   ];
+
+//   // Filtered events
+//   const filteredEvents = events.filter((event) => {
+//     const matchesSearch =
+//       event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       event.description?.toLowerCase().includes(searchTerm.toLowerCase());
+//     const matchesCategory =
+//       categoryFilter === "All" ||
+//       event.categories?.some((cat) => cat.name === categoryFilter);
+//     return matchesSearch && matchesCategory;
+//   });
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section
+//         className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
+//           darkMode ? "bg-gray-900" : "bg-white"
+//         }`}
+//       >
+//         <h2
+//           className={`text-3xl font-bold mb-8 text-center ${
+//             darkMode ? "text-white" : "text-gray-900"
+//           }`}
+//         >
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Search & Filter */}
+//         <div className="flex flex-col sm:flex-row gap-4 mb-6 justify-between items-center">
+//           {/* Search Bar */}
+//           <div className="relative w-full sm:w-1/2">
+//             <input
+//               type="text"
+//               placeholder="Search events..."
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//                 darkMode
+//                   ? "bg-gray-800 border-gray-700 text-white"
+//                   : "bg-white border-gray-300 text-gray-900"
+//               }`}
+//             />
+//             <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
+//           </div>
+
+//           {/* Category Filter */}
+//           <select
+//             value={categoryFilter}
+//             onChange={(e) => setCategoryFilter(e.target.value)}
+//             className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//               darkMode
+//                 ? "bg-gray-800 border-gray-700 text-white"
+//                 : "bg-white border-gray-300 text-gray-900"
+//             }`}
+//           >
+//             {categories.map((cat, idx) => (
+//               <option key={idx} value={cat}>
+//                 {cat}
+//               </option>
+//             ))}
+//           </select>
+//         </div>
+
+//         {/* Events Table */}
+//         <div className="overflow-x-auto rounded-xl shadow-lg">
+//           <table
+//             className={`w-full border-collapse ${
+//               darkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-900"
+//             }`}
+//           >
+//             <thead>
+//               <tr
+//                 className={`${
+//                   darkMode ? "bg-gray-700 text-gray-200" : "bg-gray-100"
+//                 } text-left`}
+//               >
+//                 <th className="p-3 text-sm font-semibold">Event Name</th>
+//                 <th className="p-3 text-sm font-semibold">Date</th>
+//                 <th className="p-3 text-sm font-semibold">Category</th>
+//                 <th className="p-3 text-sm font-semibold">Proof</th>
+//                 <th className="p-3 text-sm font-semibold">Details</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {filteredEvents.length > 0 ? (
+//                 filteredEvents.map((event, index) => (
+//                   <>
+//                     <tr
+//                       key={event.id}
+//                       className={`border-b ${
+//                         darkMode ? "border-gray-700" : "border-gray-200"
+//                       } hover:bg-blue-50/10`}
+//                     >
+//                       {/* Event Name */}
+//                       <td className="p-3 text-sm font-medium">
+//                         {event.title || "No Title"}
+//                       </td>
+
+//                       {/* Date */}
+//                       <td className="p-3 text-xs">
+//                         {event.date_event
+//                           ? new Date(event.date_event).toLocaleString()
+//                           : "No Date"}
+//                       </td>
+
+//                       {/* Categories */}
+//                       <td className="p-3 text-xs">
+//                         {event.categories?.length > 0 ? (
+//                           <div className="flex flex-wrap gap-1">
+//                             {event.categories.map((cat) => (
+//                               <span
+//                                 key={cat.category_id}
+//                                 className="bg-green-600 text-white px-2 py-1 rounded-full text-xs"
+//                               >
+//                                 {cat.name}
+//                               </span>
+//                             ))}
+//                           </div>
+//                         ) : (
+//                           "-"
+//                         )}
+//                       </td>
+
+//                       {/* Proof Image */}
+//                       <td className="p-3">
+//                         {event.proof ? (
+//                           <img
+//                             src={event.proof}
+//                             alt="Proof"
+//                             onClick={() => setPopupImage(event.proof)}
+//                             className="w-12 h-12 rounded-lg object-cover border cursor-pointer hover:scale-105 transition-transform"
+//                           />
+//                         ) : (
+//                           "-"
+//                         )}
+//                       </td>
+
+//                       {/* Details Expand Button */}
+//                       <td className="p-3 text-center">
+//                         <button
+//                           onClick={() =>
+//                             setExpandedRow(
+//                               expandedRow === index ? null : index
+//                             )
+//                           }
+//                           className="flex items-center gap-1 px-3 py-1 rounded-lg text-sm bg-blue-600 text-white hover:bg-blue-700 transition"
+//                         >
+//                           {expandedRow === index ? (
+//                             <>
+//                               Hide <FaChevronUp />
+//                             </>
+//                           ) : (
+//                             <>
+//                               More <FaChevronDown />
+//                             </>
+//                           )}
+//                         </button>
+//                       </td>
+//                     </tr>
+
+//                     {/* Expanded Row */}
+//                     {expandedRow === index && (
+//                       <tr>
+//                         <td colSpan="5" className="p-4">
+//                           <div
+//                             className={`rounded-lg p-4 shadow-inner ${
+//                               darkMode ? "bg-gray-700" : "bg-gray-50"
+//                             }`}
+//                           >
+//                             {/* Description */}
+//                             <p
+//                               className={`mb-3 text-sm ${
+//                                 darkMode ? "text-gray-300" : "text-gray-700"
+//                               }`}
+//                             >
+//                               {event.description ||
+//                                 "No description available for this event."}
+//                             </p>
+
+//                             {/* Coins */}
+//                             {event.coins?.length > 0 && (
+//                               <div className="flex flex-wrap gap-2 mb-3">
+//                                 {event.coins.map((c) => (
+//                                   <span
+//                                     key={c.coin_id}
+//                                     className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1"
+//                                   >
+//                                     {c.icon && (
+//                                       <img
+//                                         src={c.icon}
+//                                         alt={c.symbol}
+//                                         className="w-4 h-4 rounded-full"
+//                                       />
+//                                     )}
+//                                     {c.symbol}
+//                                   </span>
+//                                 ))}
+//                               </div>
+//                             )}
+
+//                             {/* Stats */}
+//                             <div
+//                               className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-sm ${
+//                                 darkMode ? "text-gray-200" : "text-gray-700"
+//                               }`}
+//                             >
+//                               <div className="flex items-center gap-1">
+//                                 <FaThumbsUp className="text-blue-500" />{" "}
+//                                 {event.votes}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaEye className="text-green-500" />{" "}
+//                                 {event.views}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaCheckCircle className="text-yellow-400" />{" "}
+//                                 {event.confidence}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaBolt className="text-purple-500" />{" "}
+//                                 {event.trending_score}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaFire className="text-red-500" />{" "}
+//                                 {event.popular_score}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaStar className="text-orange-400" />{" "}
+//                                 {event.significant_score}
+//                               </div>
+//                             </div>
+//                           </div>
+//                         </td>
+//                       </tr>
+//                     )}
+//                   </>
+//                 ))
+//               ) : (
+//                 <tr>
+//                   <td colSpan="5" className="text-center py-6 text-gray-400">
+//                     No events found
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+
+//       {/* Proof Image Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="Proof Full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
+
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { useDarkMode } from "../context/ThemeContext";
+// import {
+//   FaThumbsUp,
+//   FaEye,
+//   FaBolt,
+//   FaFire,
+//   FaStar,
+//   FaCheckCircle,
+//   FaChevronDown,
+//   FaChevronUp,
+//   FaSearch,
+// } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [expandedRow, setExpandedRow] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [categoryFilter, setCategoryFilter] = useState("All");
+//   const { darkMode } = useDarkMode();
+
+//   // Fetch events
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events?.slice(0, 50) || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Unique categories
+//   const categories = [
+//     "All",
+//     ...new Set(
+//       events.flatMap((e) => e.categories?.map((cat) => cat.name) || [])
+//     ),
+//   ];
+
+//   // Filtered events
+//   const filteredEvents = events.filter((event) => {
+//     const matchesSearch =
+//       event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       event.description?.toLowerCase().includes(searchTerm.toLowerCase());
+//     const matchesCategory =
+//       categoryFilter === "All" ||
+//       event.categories?.some((cat) => cat.name === categoryFilter);
+//     return matchesSearch && matchesCategory;
+//   });
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section
+//         className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
+//           darkMode ? "bg-gray-900" : "bg-white"
+//         }`}
+//       >
+//         <h2
+//           className={`text-3xl font-bold mb-8 text-center ${
+//             darkMode ? "text-white" : "text-gray-900"
+//           }`}
+//         >
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Search & Filter */}
+//         <div className="flex flex-col sm:flex-row gap-4 mb-6 justify-between items-center">
+//           {/* Search Bar */}
+//           <div className="relative w-full sm:w-1/2">
+//             <input
+//               type="text"
+//               placeholder="Search events..."
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//                 darkMode
+//                   ? "bg-gray-800 border-gray-700 text-white"
+//                   : "bg-white border-gray-300 text-gray-900"
+//               }`}
+//             />
+//             <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
+//           </div>
+
+//           {/* Category Filter */}
+//           <select
+//             value={categoryFilter}
+//             onChange={(e) => setCategoryFilter(e.target.value)}
+//             className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//               darkMode
+//                 ? "bg-gray-800 border-gray-700 text-white"
+//                 : "bg-white border-gray-300 text-gray-900"
+//             }`}
+//           >
+//             {categories.map((cat, idx) => (
+//               <option key={idx} value={cat}>
+//                 {cat}
+//               </option>
+//             ))}
+//           </select>
+//         </div>
+
+//         {/* Events Table */}
+//         <div className="overflow-x-auto rounded-xl shadow-lg">
+//           <table
+//             className={`w-full border-collapse ${
+//               darkMode ? "bg-gray-800 text-gray-200" : "bg-white text-gray-900"
+//             }`}
+//           >
+//             <thead>
+//               <tr
+//                 className={`${
+//                   darkMode ? "bg-gray-700 text-gray-200" : "bg-gray-100"
+//                 } text-left`}
+//               >
+//                 <th className="p-3 text-sm font-semibold">Event Name</th>
+//                 <th className="p-3 text-sm font-semibold">Date</th>
+//                 <th className="p-3 text-sm font-semibold">Category</th>
+//                 <th className="p-3 text-sm font-semibold">Proof</th>
+//                 <th className="p-3 text-sm font-semibold">Details</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {filteredEvents.length > 0 ? (
+//                 filteredEvents.map((event, index) => (
+//                   <>
+//                     <tr
+//                       key={event.id}
+//                       className={`border-b ${
+//                         darkMode ? "border-gray-700" : "border-gray-200"
+//                       } hover:bg-blue-50/10`}
+//                     >
+//                       {/* Event Name */}
+//                       <td className="p-3 text-sm font-medium">
+//                         {event.title || "No Title"}
+//                       </td>
+
+//                       {/* Date */}
+//                       <td className="p-3 text-xs">
+//                         {event.date_event
+//                           ? new Date(event.date_event).toLocaleString()
+//                           : "No Date"}
+//                       </td>
+
+//                       {/* Categories */}
+//                       <td className="p-3 text-xs">
+//                         {event.categories?.length > 0 ? (
+//                           <div className="flex flex-wrap gap-1">
+//                             {event.categories.map((cat) => (
+//                               <span
+//                                 key={cat.category_id}
+//                                 className="bg-green-600 text-white px-2 py-1 rounded-full text-xs"
+//                               >
+//                                 {cat.name}
+//                               </span>
+//                             ))}
+//                           </div>
+//                         ) : (
+//                           "-"
+//                         )}
+//                       </td>
+
+//                       {/* Proof Image (thumbnail) */}
+//                       <td className="p-3">
+//                         {event.proof ? (
+//                           <img
+//                             src={event.proof}
+//                             alt="Proof"
+//                             onClick={() => setPopupImage(event.proof)}
+//                             className="w-12 h-12 rounded-lg object-cover border cursor-pointer hover:scale-105 transition-transform"
+//                           />
+//                         ) : (
+//                           "-"
+//                         )}
+//                       </td>
+
+//                       {/* Details Expand Button */}
+//                       <td className="p-3 text-center">
+//                         <button
+//                           onClick={() =>
+//                             setExpandedRow(
+//                               expandedRow === index ? null : index
+//                             )
+//                           }
+//                           className="flex items-center gap-1 px-3 py-1 rounded-lg text-sm bg-blue-600 text-white hover:bg-blue-700 transition"
+//                         >
+//                           {expandedRow === index ? (
+//                             <>
+//                               Hide <FaChevronUp />
+//                             </>
+//                           ) : (
+//                             <>
+//                               More <FaChevronDown />
+//                             </>
+//                           )}
+//                         </button>
+//                       </td>
+//                     </tr>
+
+//                     {/* Expanded Row */}
+//                     {expandedRow === index && (
+//                       <tr>
+//                         <td colSpan="5" className="p-4">
+//                           <div
+//                             className={`rounded-lg p-4 shadow-inner ${
+//                               darkMode ? "bg-gray-700" : "bg-gray-50"
+//                             }`}
+//                           >
+//                             {/* Description */}
+//                             <p
+//                               className={`mb-3 text-sm ${
+//                                 darkMode ? "text-gray-300" : "text-gray-700"
+//                               }`}
+//                             >
+//                               {event.description ||
+//                                 "No description available for this event."}
+//                             </p>
+
+//                             {/* Coins */}
+//                             {event.coins?.length > 0 && (
+//                               <div className="flex flex-wrap gap-2 mb-3">
+//                                 {event.coins.map((c) => (
+//                                   <span
+//                                     key={c.coin_id}
+//                                     className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1"
+//                                   >
+//                                     {c.icon && (
+//                                       <img
+//                                         src={c.icon}
+//                                         alt={c.symbol}
+//                                         className="w-4 h-4 rounded-full"
+//                                       />
+//                                     )}
+//                                     {c.symbol}
+//                                   </span>
+//                                 ))}
+//                               </div>
+//                             )}
+
+//                             {/* ✅ Sources */}
+//                             {event.sources?.length > 0 && (
+//                               <div className="mb-3">
+//                                 <h4
+//                                   className={`font-semibold mb-2 ${
+//                                     darkMode ? "text-white" : "text-gray-900"
+//                                   }`}
+//                                 >
+//                                   Sources:
+//                                 </h4>
+//                                 <ul className="list-disc list-inside space-y-1">
+//                                   {event.sources.map((src, i) => (
+//                                     <li key={i}>
+//                                       <a
+//                                         href={src}
+//                                         target="_blank"
+//                                         rel="noopener noreferrer"
+//                                         className="text-blue-500 hover:underline"
+//                                       >
+//                                         {src}
+//                                       </a>
+//                                     </li>
+//                                   ))}
+//                                 </ul>
+//                               </div>
+//                             )}
+
+//                             {/* ✅ Proof (bigger image) */}
+//                             {event.proof && (
+//                               <div className="mb-3">
+//                                 <h4
+//                                   className={`font-semibold mb-2 ${
+//                                     darkMode ? "text-white" : "text-gray-900"
+//                                   }`}
+//                                 >
+//                                   Proof:
+//                                 </h4>
+//                                 <img
+//                                   src={event.proof}
+//                                   alt="Proof Full"
+//                                   className="max-h-64 w-auto rounded-lg shadow-md cursor-pointer hover:scale-105 transition-transform"
+//                                   onClick={() => setPopupImage(event.proof)}
+//                                 />
+//                               </div>
+//                             )}
+
+//                             {/* Stats */}
+//                             <div
+//                               className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-sm ${
+//                                 darkMode ? "text-gray-200" : "text-gray-700"
+//                               }`}
+//                             >
+//                               <div className="flex items-center gap-1">
+//                                 <FaThumbsUp className="text-blue-500" />{" "}
+//                                 {event.votes}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaEye className="text-green-500" />{" "}
+//                                 {event.views}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaCheckCircle className="text-yellow-400" />{" "}
+//                                 {event.confidence}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaBolt className="text-purple-500" />{" "}
+//                                 {event.trending_score}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaFire className="text-red-500" />{" "}
+//                                 {event.popular_score}
+//                               </div>
+//                               <div className="flex items-center gap-1">
+//                                 <FaStar className="text-orange-400" />{" "}
+//                                 {event.significant_score}
+//                               </div>
+//                             </div>
+//                           </div>
+//                         </td>
+//                       </tr>
+//                     )}
+//                   </>
+//                 ))
+//               ) : (
+//                 <tr>
+//                   <td colSpan="5" className="text-center py-6 text-gray-400">
+//                     No events found
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+
+//       {/* Proof Image Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="Proof Full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { useDarkMode } from "../context/ThemeContext";
+// import { FaLink } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [selectedEvent, setSelectedEvent] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+//   const { darkMode } = useDarkMode();
+
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section
+//         className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
+//           darkMode ? "bg-gray-900" : "bg-white"
+//         }`}
+//       >
+//         <h2
+//           className={`text-3xl font-bold mb-6 text-center ${
+//             darkMode ? "text-white" : "text-gray-900"
+//           }`}
+//         >
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         <div className="overflow-x-auto">
+//           <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
+//             <thead
+//               className={`${
+//                 darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"
+//               }`}
+//             >
+//               <tr>
+//                 <th className="px-4 py-2 text-left">Event Name</th>
+//                 <th className="px-4 py-2 text-left">Date</th>
+//                 <th className="px-4 py-2 text-left">Categories</th>
+//                 <th className="px-4 py-2 text-left">Coins</th>
+//                 <th className="px-4 py-2 text-left">Proof</th>
+//                 <th className="px-4 py-2 text-left">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {events.map((event) => (
+//                 <tr
+//                   key={event.id}
+//                   className={`border-t ${
+//                     darkMode ? "border-gray-700" : "border-gray-300"
+//                   } hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors`}
+//                 >
+//                   <td className="px-4 py-2">{event.title || "No Title"}</td>
+//                   <td className="px-4 py-2">
+//                     {event.date_event
+//                       ? new Date(event.date_event).toLocaleString()
+//                       : "No Date"}
+//                   </td>
+//                   <td className="px-4 py-2">
+//                     {event.categories?.map((cat) => cat.name).join(", ") || "-"}
+//                   </td>
+//                   <td className="px-4 py-2">
+//                     {event.coins?.map((c) => c.symbol).join(", ") || "-"}
+//                   </td>
+//                   <td className="px-4 py-2">
+//                     {event.proof && (
+//                       <img
+//                         src={event.proof}
+//                         alt="proof"
+//                         onClick={() => setPopupImage(event.proof)}
+//                         className="w-16 h-16 object-cover rounded-md cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
+//                       />
+//                     )}
+//                   </td>
+//                   <td className="px-4 py-2">
+//                     <button
+//                       onClick={() => setSelectedEvent(event)}
+//                       className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+//                     >
+//                       Read More
+//                     </button>
+//                     {event.source && (
+//                       <a
+//                         href={event.source}
+//                         target="_blank"
+//                         rel="noreferrer"
+//                         className="ml-2 text-yellow-400 hover:underline text-sm flex items-center gap-1"
+//                       >
+//                         <FaLink /> Source
+//                       </a>
+//                     )}
+//                   </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+
+//       {/* Event Modal */}
+//       {selectedEvent && (
+//         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+//           <div
+//             className={`max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-2xl flex flex-col overflow-hidden transition-colors duration-300 ${
+//               darkMode ? "bg-gray-900" : "bg-white"
+//             }`}
+//           >
+//             <button
+//               onClick={() => setSelectedEvent(null)}
+//               className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500 ${
+//                 darkMode ? "text-gray-400" : "text-gray-700"
+//               }`}
+//             >
+//               ✖
+//             </button>
+
+//             <h2
+//               className={`text-2xl font-bold mb-2 ${
+//                 darkMode ? "text-white" : "text-gray-900"
+//               }`}
+//             >
+//               {selectedEvent.title}
+//             </h2>
+//             <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-4`}>
+//               {selectedEvent.date_event
+//                 ? new Date(selectedEvent.date_event).toLocaleString()
+//                 : "No Date"}
+//             </p>
+
+//             {selectedEvent.proof && (
+//               <img
+//                 src={selectedEvent.proof}
+//                 alt="proof"
+//                 onClick={() => setPopupImage(selectedEvent.proof)}
+//                 className="w-full h-40 object-cover rounded-md cursor-pointer border mb-4"
+//               />
+//             )}
+
+//             <div className={`flex-1 overflow-y-auto text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+//               <p className="mb-2 whitespace-pre-line">{selectedEvent.description}</p>
+//               <p className="mb-2">
+//                 <strong>Categories:</strong>{" "}
+//                 {selectedEvent.categories?.map((c) => c.name).join(", ")}
+//               </p>
+//               <p className="mb-2">
+//                 <strong>Coins:</strong> {selectedEvent.coins?.map((c) => c.symbol).join(", ")}
+//               </p>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Proof Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="proof full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
+// import { useEffect, useState } from "react";
+// import Navbar from "../components/Navbar";
+// import { useDarkMode } from "../context/ThemeContext";
+// import { FaLink, FaSearch } from "react-icons/fa";
+
+// const EventPage = () => {
+//   const [events, setEvents] = useState([]);
+//   const [selectedEvent, setSelectedEvent] = useState(null);
+//   const [popupImage, setPopupImage] = useState(null);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const [categoryFilter, setCategoryFilter] = useState("All");
+//   const { darkMode } = useDarkMode();
+
+//   // Fetch events from backend
+//   const fetchEvents = async () => {
+//     try {
+//       const res = await fetch(
+//         "https://cryptonewsbackend.up.railway.app/api/events"
+//       );
+//       const data = await res.json();
+//       setEvents(data.events || []);
+//     } catch (error) {
+//       console.error("Error fetching events:", error);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchEvents();
+//     const interval = setInterval(fetchEvents, 60000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   // Get unique categories for filter dropdown
+//   const categories = [
+//     "All",
+//     ...new Set(events.flatMap((e) => e.categories?.map((cat) => cat.name) || [])),
+//   ];
+
+//   // Filtered events
+//   const filteredEvents = events.filter((event) => {
+//     const matchesSearch =
+//       event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+//       event.description?.toLowerCase().includes(searchTerm.toLowerCase());
+//     const matchesCategory =
+//       categoryFilter === "All" ||
+//       event.categories?.some((cat) => cat.name === categoryFilter);
+//     return matchesSearch && matchesCategory;
+//   });
+
+//   return (
+//     <>
+//       <Navbar />
+
+//       <section
+//         className={`max-w-screen-2xl mx-auto p-6 transition-colors duration-300 ${
+//           darkMode ? "bg-gray-900" : "bg-white"
+//         }`}
+//       >
+//         <h2
+//           className={`text-3xl font-bold mb-6 text-center ${
+//             darkMode ? "text-white" : "text-gray-900"
+//           }`}
+//         >
+//           📢 Latest Crypto Events
+//         </h2>
+
+//         {/* Search & Category Filter */}
+//         <div className="flex flex-col sm:flex-row gap-4 mb-4 items-center justify-between">
+//           <div className="relative w-full sm:w-1/2">
+//             <input
+//               type="text"
+//               placeholder="Search events..."
+//               value={searchTerm}
+//               onChange={(e) => setSearchTerm(e.target.value)}
+//               className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//                 darkMode
+//                   ? "bg-gray-800 border-gray-700 text-white"
+//                   : "bg-white border-gray-300 text-gray-900"
+//               }`}
+//             />
+//             <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
+//           </div>
+
+//           <select
+//             value={categoryFilter}
+//             onChange={(e) => setCategoryFilter(e.target.value)}
+//             className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+//               darkMode
+//                 ? "bg-gray-800 border-gray-700 text-white"
+//                 : "bg-white border-gray-300 text-gray-900"
+//             }`}
+//           >
+//             {categories.map((cat, idx) => (
+//               <option key={idx} value={cat}>
+//                 {cat}
+//               </option>
+//             ))}
+//           </select>
+//         </div>
+
+//         {/* Events Table */}
+//         <div className="overflow-x-auto rounded-lg shadow">
+//           <table className="min-w-full border-collapse">
+//             <thead
+//               className={`${
+//                 darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"
+//               }`}
+//             >
+//               <tr>
+//                 <th className="px-4 py-2 text-left">Event Name</th>
+//                 <th className="px-4 py-2 text-left">Date</th>
+//                 <th className="px-4 py-2 text-left">Categories</th>
+//                 <th className="px-4 py-2 text-left">Coins</th>
+//                 <th className="px-4 py-2 text-left">Proof</th>
+//                 <th className="px-4 py-2 text-left">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {filteredEvents.length > 0 ? (
+//                 filteredEvents.map((event) => (
+//                   <tr
+//                     key={event.id}
+//                     className={`border-t ${
+//                       darkMode ? "border-gray-700" : "border-gray-300"
+//                     } hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors`}
+//                   >
+//                     <td className="px-4 py-2">{event.title || "No Title"}</td>
+//                     <td className="px-4 py-2">
+//                       {event.date_event
+//                         ? new Date(event.date_event).toLocaleString()
+//                         : "No Date"}
+//                     </td>
+//                     <td className="px-4 py-2">
+//                       {event.categories?.map((cat) => cat.name).join(", ") || "-"}
+//                     </td>
+//                     <td className="px-4 py-2">
+//                       {event.coins?.map((c) => c.symbol).join(", ") || "-"}
+//                     </td>
+//                     <td className="px-4 py-2">
+//                       {event.proof && (
+//                         <img
+//                           src={event.proof}
+//                           alt="proof"
+//                           onClick={() => setPopupImage(event.proof)}
+//                           className="w-16 h-16 object-cover rounded-md cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
+//                         />
+//                       )}
+//                     </td>
+//                     <td className="px-4 py-2 flex gap-2 items-center">
+//                       <button
+//                         onClick={() => setSelectedEvent(event)}
+//                         className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+//                       >
+//                         Read More
+//                       </button>
+//                       {event.source && (
+//                         <a
+//                           href={event.source}
+//                           target="_blank"
+//                           rel="noreferrer"
+//                           className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
+//                         >
+//                           <FaLink /> Source
+//                         </a>
+//                       )}
+//                     </td>
+//                   </tr>
+//                 ))
+//               ) : (
+//                 <tr>
+//                   <td colSpan="6" className="text-center py-4 text-gray-400">
+//                     No events found
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+//       </section>
+
+//       {/* Event Modal */}
+//       {selectedEvent && (
+//         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
+//           <div
+//             className={`max-w-3xl w-full max-h-[85vh] p-6 rounded-xl shadow-2xl flex flex-col overflow-hidden transition-colors duration-300 ${
+//               darkMode ? "bg-gray-900" : "bg-white"
+//             }`}
+//           >
+//             <button
+//               onClick={() => setSelectedEvent(null)}
+//               className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500 ${
+//                 darkMode ? "text-gray-400" : "text-gray-700"
+//               }`}
+//             >
+//               ✖
+//             </button>
+
+//             <h2
+//               className={`text-2xl font-bold mb-2 ${
+//                 darkMode ? "text-white" : "text-gray-900"
+//               }`}
+//             >
+//               {selectedEvent.title}
+//             </h2>
+//             <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-4`}>
+//               {selectedEvent.date_event
+//                 ? new Date(selectedEvent.date_event).toLocaleString()
+//                 : "No Date"}
+//             </p>
+
+//             {selectedEvent.proof && (
+//               <img
+//                 src={selectedEvent.proof}
+//                 alt="proof"
+//                 onClick={() => setPopupImage(selectedEvent.proof)}
+//                 className="w-full h-40 object-cover rounded-md cursor-pointer border mb-4"
+//               />
+//             )}
+
+//             <div className={`flex-1 overflow-y-auto text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+//               <p className="mb-2 whitespace-pre-line">{selectedEvent.description}</p>
+//               <p className="mb-2">
+//                 <strong>Categories:</strong>{" "}
+//                 {selectedEvent.categories?.map((c) => c.name).join(", ")}
+//               </p>
+//               <p className="mb-2">
+//                 <strong>Coins:</strong> {selectedEvent.coins?.map((c) => c.symbol).join(", ")}
+//               </p>
+//             </div>
+//           </div>
+//         </div>
+//       )}
+
+//       {/* Proof Popup */}
+//       {popupImage && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
+//           onClick={() => setPopupImage(null)}
+//         >
+//           <div className="relative max-w-4xl w-full p-4">
+//             <button
+//               onClick={() => setPopupImage(null)}
+//               className="absolute top-2 right-2 text-2xl font-bold text-white hover:text-red-400"
+//             >
+//               ✖
+//             </button>
+//             <img
+//               src={popupImage}
+//               alt="proof full"
+//               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
+//             />
+//           </div>
+//         </div>
+//       )}
+//     </>
+//   );
+// };
+
+// export default EventPage;
+
+
 
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useDarkMode } from "../context/ThemeContext";
-import {
-  FaThumbsUp,
-  FaEye,
-  FaBolt,
-  FaFire,
-  FaStar,
-  FaCheckCircle,
-  FaLink,
-} from "react-icons/fa";
+import { FaLink, FaSearch, FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const EventPage = () => {
   const [events, setEvents] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [popupImage, setPopupImage] = useState(null);
-  const { darkMode } = useDarkMode(); // ⬅️ get darkMode state
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
+  const [sortConfig, setSortConfig] = useState({ key: "votes", direction: "desc" }); // Default leaderboard sort
+  const { darkMode } = useDarkMode();
 
   // Fetch events
   const fetchEvents = async () => {
@@ -2227,7 +3924,7 @@ const EventPage = () => {
         "https://cryptonewsbackend.up.railway.app/api/events"
       );
       const data = await res.json();
-      setEvents(data.events?.slice(0, 12) || []);
+      setEvents(data.events || []);
     } catch (error) {
       console.error("Error fetching events:", error);
     }
@@ -2235,9 +3932,45 @@ const EventPage = () => {
 
   useEffect(() => {
     fetchEvents();
-    const interval = setInterval(fetchEvents, 60000);
+    const interval = setInterval(fetchEvents, 60000); // refresh every 60s
     return () => clearInterval(interval);
   }, []);
+
+  // Unique categories for filter
+  const categories = [
+    "All",
+    ...new Set(events.flatMap((e) => e.categories?.map((cat) => cat.name) || [])),
+  ];
+
+  // Filter events by search & category
+  let filteredEvents = events.filter((event) => {
+    const matchesSearch =
+      event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      event.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      categoryFilter === "All" ||
+      event.categories?.some((cat) => cat.name === categoryFilter);
+    return matchesSearch && matchesCategory;
+  });
+
+  // Sort events by sortConfig
+  if (sortConfig.key) {
+    filteredEvents.sort((a, b) => {
+      const aValue = a[sortConfig.key] || 0;
+      const bValue = b[sortConfig.key] || 0;
+      if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
+  // Handle sorting when header clicked
+  const handleSort = (key) => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+    }));
+  };
 
   return (
     <>
@@ -2249,119 +3982,171 @@ const EventPage = () => {
         }`}
       >
         <h2
-          className={`text-3xl font-bold mb-8 text-center ${
+          className={`text-3xl font-bold mb-6 text-center ${
             darkMode ? "text-white" : "text-gray-900"
           }`}
         >
           📢 Latest Crypto Events
         </h2>
 
-        {/* Events Grid */}
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <div
-              key={event.id}
-              className={`p-5 rounded-xl shadow-lg flex flex-col transition-transform transform hover:scale-[1.03] ${
+        {/* Search & Category Filter */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-4 items-center justify-between">
+          <div className="relative w-full sm:w-1/2">
+            <input
+              type="text"
+              placeholder="Search events..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
                 darkMode
-                  ? "bg-gray-800 hover:bg-gray-700"
-                  : "bg-gray-100 hover:bg-gray-200"
+                  ? "bg-gray-800 border-gray-700 text-white"
+                  : "bg-white border-gray-300 text-gray-900"
+              }`}
+            />
+            <FaSearch className="absolute left-3 top-2.5 text-gray-400" />
+          </div>
+
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className={`px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 outline-none ${
+              darkMode
+                ? "bg-gray-800 border-gray-700 text-white"
+                : "bg-white border-gray-300 text-gray-900"
+            }`}
+          >
+            {categories.map((cat, idx) => (
+              <option key={idx} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Events Table */}
+        <div className="overflow-x-auto rounded-lg shadow">
+          <table className="min-w-full border-collapse">
+            <thead
+              className={`${
+                darkMode ? "bg-gray-800 text-white" : "bg-gray-100 text-gray-900"
               }`}
             >
-              {/* Title */}
-              <h3 className={`${darkMode ? "text-white" : "text-gray-900"} text-lg font-bold mb-1`}>
-                {event.title || "No Title"}
-              </h3>
-
-              {/* Date */}
-              <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-2`}>
-                {event.date_event
-                  ? new Date(event.date_event).toLocaleString()
-                  : "No Date"}
-              </p>
-
-              {/* Proof Image */}
-              {event.proof && (
-                <div className="mb-3">
-                  <img
-                    src={event.proof}
-                    alt="Event proof"
-                    onClick={() => setPopupImage(event.proof)}
-                    className={`w-full h-32 object-cover rounded-md cursor-pointer border transition-transform ${
-                      darkMode
-                        ? "border-gray-700 hover:scale-105"
-                        : "border-gray-300 hover:scale-105"
+              <tr>
+                <th className="px-4 py-2 text-left">Event Name</th>
+                <th
+                  className={`px-4 py-2 text-left cursor-pointer ${
+                    sortConfig.key === "date_event" ? "underline" : ""
+                  }`}
+                  onClick={() => handleSort("date_event")}
+                >
+                  Date{" "}
+                  {sortConfig.key === "date_event" &&
+                    (sortConfig.direction === "asc" ? (
+                      <FaChevronUp className="inline" />
+                    ) : (
+                      <FaChevronDown className="inline" />
+                    ))}
+                </th>
+                <th className="px-4 py-2 text-left">Categories</th>
+                <th className="px-4 py-2 text-left">Coins</th>
+                <th className="px-4 py-2 text-left">Proof</th>
+                <th
+                  className={`px-4 py-2 text-left cursor-pointer ${
+                    sortConfig.key === "votes" ? "underline" : ""
+                  }`}
+                  onClick={() => handleSort("votes")}
+                >
+                  Votes{" "}
+                  {sortConfig.key === "votes" &&
+                    (sortConfig.direction === "asc" ? (
+                      <FaChevronUp className="inline" />
+                    ) : (
+                      <FaChevronDown className="inline" />
+                    ))}
+                </th>
+                <th
+                  className={`px-4 py-2 text-left cursor-pointer ${
+                    sortConfig.key === "trending_score" ? "underline" : ""
+                  }`}
+                  onClick={() => handleSort("trending_score")}
+                >
+                  Trending{" "}
+                  {sortConfig.key === "trending_score" &&
+                    (sortConfig.direction === "asc" ? (
+                      <FaChevronUp className="inline" />
+                    ) : (
+                      <FaChevronDown className="inline" />
+                    ))}
+                </th>
+                <th className="px-4 py-2 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEvents.length > 0 ? (
+                filteredEvents.map((event) => (
+                  <tr
+                    key={event.id}
+                    className={`border-t transition-colors cursor-pointer hover:${
+                      darkMode ? "bg-gray-700" : "bg-gray-200"
                     }`}
-                  />
-                </div>
-              )}
-
-              {/* Coins */}
-              {event.coins?.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {event.coins.map((c) => (
-                    <span
-                      key={c.coin_id}
-                      className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full flex items-center gap-1"
-                    >
-                      {c.icon && (
+                  >
+                    <td className="px-4 py-2">{event.title || "No Title"}</td>
+                    <td className="px-4 py-2">
+                      {event.date_event
+                        ? new Date(event.date_event).toLocaleString()
+                        : "No Date"}
+                    </td>
+                    <td className="px-4 py-2">
+                      {event.categories?.map((cat) => cat.name).join(", ") || "-"}
+                    </td>
+                    <td className="px-4 py-2">
+                      {event.coins?.map((c) => c.symbol).join(", ") || "-"}
+                    </td>
+                    <td className="px-4 py-2">
+                      {event.proof && (
                         <img
-                          src={c.icon}
-                          alt={c.symbol}
-                          className="w-4 h-4 rounded-full"
+                          src={event.proof}
+                          alt="proof"
+                          onClick={() => setPopupImage(event.proof)}
+                          className="w-16 h-16 object-cover rounded-md cursor-pointer border border-gray-300 hover:scale-105 transition-transform"
                         />
                       )}
-                      {c.symbol}
-                    </span>
-                  ))}
-                </div>
+                    </td>
+                    <td className="px-4 py-2">{event.votes}</td>
+                    <td className="px-4 py-2">{event.trending_score}</td>
+                    <td className="px-4 py-2 flex gap-2 items-center">
+                      <button
+                        onClick={() => setSelectedEvent(event)}
+                        className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                      >
+                        Read More
+                      </button>
+                      {event.source && (
+                        <a
+                          href={event.source}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
+                        >
+                          <FaLink /> Source
+                        </a>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8" className="text-center py-4 text-gray-400">
+                    No events found
+                  </td>
+                </tr>
               )}
-
-              {/* Categories */}
-              {event.categories?.length > 0 && (
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {event.categories.map((cat) => (
-                    <span
-                      key={cat.category_id}
-                      className="text-xs bg-green-600 text-white px-2 py-1 rounded-full"
-                    >
-                      {cat.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Description */}
-              <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm mb-3`}>
-                {event.description
-                  ? event.description.slice(0, 120) + "..."
-                  : "No description available"}
-              </p>
-
-              {/* Actions */}
-              <div className="flex justify-between items-center mt-auto">
-                <button
-                  onClick={() => setSelectedEvent(event)}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm"
-                >
-                  Read More
-                </button>
-                {event.source && (
-                  <a
-                    href={event.source}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-yellow-400 hover:underline text-sm flex items-center gap-1"
-                  >
-                    <FaLink /> Verified Source
-                  </a>
-                )}
-              </div>
-            </div>
-          ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
-      {/* Event Modal */}
+      {/* Event Modal & Proof Popup (same as previous version) */}
       {selectedEvent && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 p-4">
           <div
@@ -2369,7 +4154,6 @@ const EventPage = () => {
               darkMode ? "bg-gray-900" : "bg-white"
             }`}
           >
-            {/* Close Button */}
             <button
               onClick={() => setSelectedEvent(null)}
               className={`absolute top-2 right-2 text-xl font-bold hover:text-red-500 ${
@@ -2379,75 +4163,42 @@ const EventPage = () => {
               ✖
             </button>
 
-            {/* Title & Date */}
-            <div className="mb-4">
-              <h2 className={`${darkMode ? "text-white" : "text-gray-900"} text-2xl font-bold mb-1`}>
-                {selectedEvent.title}
-              </h2>
-              <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs`}>
-                {selectedEvent.date_event
-                  ? new Date(selectedEvent.date_event).toLocaleString()
-                  : "No Date"}
-              </p>
-            </div>
+            <h2
+              className={`text-2xl font-bold mb-2 ${
+                darkMode ? "text-white" : "text-gray-900"
+              }`}
+            >
+              {selectedEvent.title}
+            </h2>
+            <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} text-xs mb-4`}>
+              {selectedEvent.date_event
+                ? new Date(selectedEvent.date_event).toLocaleString()
+                : "No Date"}
+            </p>
 
-            {/* Proof Image */}
             {selectedEvent.proof && (
-              <div className="mb-4 flex flex-col gap-2">
-                <img
-                  src={selectedEvent.proof}
-                  alt="Event proof"
-                  onClick={() => setPopupImage(selectedEvent.proof)}
-                  className={`w-full h-40 object-cover rounded-md cursor-pointer border transition-transform ${
-                    darkMode ? "border-gray-700 hover:scale-105" : "border-gray-300 hover:scale-105"
-                  }`}
-                />
-                {selectedEvent.source && (
-                  <a
-                    href={selectedEvent.source}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm text-center"
-                  >
-                    🌐 Official Post
-                  </a>
-                )}
-              </div>
+              <img
+                src={selectedEvent.proof}
+                alt="proof"
+                onClick={() => setPopupImage(selectedEvent.proof)}
+                className="w-full h-40 object-cover rounded-md cursor-pointer border mb-4"
+              />
             )}
 
-            {/* Full Description */}
-            <div className="flex-1 overflow-y-auto pr-2 mb-4">
-              <p className={`${darkMode ? "text-gray-300" : "text-gray-700"} text-sm leading-relaxed whitespace-pre-line`}>
-                {selectedEvent.description || "No description available"}
+            <div className={`flex-1 overflow-y-auto text-sm ${darkMode ? "text-gray-300" : "text-gray-700"}`}>
+              <p className="mb-2 whitespace-pre-line">{selectedEvent.description}</p>
+              <p className="mb-2">
+                <strong>Categories:</strong>{" "}
+                {selectedEvent.categories?.map((c) => c.name).join(", ")}
               </p>
-            </div>
-
-            {/* Stats */}
-            <div className={`text-sm flex flex-wrap gap-4 items-center border-t pt-3 ${darkMode ? "text-gray-400 border-gray-700" : "text-gray-700 border-gray-300"}`}>
-              <div className="flex items-center gap-1">
-                <FaThumbsUp className="text-blue-500" /> {selectedEvent.votes}
-              </div>
-              <div className="flex items-center gap-1">
-                <FaEye className="text-green-500" /> {selectedEvent.views}
-              </div>
-              <div className="flex items-center gap-1">
-                <FaCheckCircle className="text-yellow-400" /> {selectedEvent.confidence}
-              </div>
-              <div className="flex items-center gap-1">
-                <FaBolt className="text-purple-500" /> {selectedEvent.trending_score}
-              </div>
-              <div className="flex items-center gap-1">
-                <FaFire className="text-red-500" /> {selectedEvent.popular_score}
-              </div>
-              <div className="flex items-center gap-1">
-                <FaStar className="text-orange-400" /> {selectedEvent.significant_score}
-              </div>
+              <p className="mb-2">
+                <strong>Coins:</strong> {selectedEvent.coins?.map((c) => c.symbol).join(", ")}
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Proof Image Popup */}
       {popupImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-[100]"
@@ -2462,7 +4213,7 @@ const EventPage = () => {
             </button>
             <img
               src={popupImage}
-              alt="Proof Full"
+              alt="proof full"
               className="max-h-[80vh] w-auto mx-auto rounded-lg shadow-lg"
             />
           </div>
