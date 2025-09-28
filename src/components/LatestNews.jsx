@@ -145,7 +145,7 @@ const LatestNews = () => {
 
   return (
     <section
-      className={`border rounded-lg p-4 transition-colors duration-300 ${
+      className={`border rounded-lg p-4 w-full max-w-sm transition-colors duration-300 ${
         darkMode ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
       }`}
     >

@@ -144,7 +144,7 @@ const Ticker = () => {
 
   return (
     <aside
-      className={`border p-4 rounded-lg w-full md:w-192 max-w-md transition-colors duration-300 ${
+      className={`border p-4 rounded-lg w-full max-w-sm transition-colors duration-300 ${
         darkMode ? "bg-gray-900 border-gray-700" : "bg-white border-gray-200"
       }`}
     >

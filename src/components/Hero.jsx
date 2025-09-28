@@ -1480,7 +1480,7 @@ const Hero = () => {
 
   useEffect(() => {
     fetchTrendingNews();
-    const interval = setInterval(fetchTrendingNews, 120000);
+    const interval = setInterval(fetchTrendingNews, 10000);
     return () => clearInterval(interval);
   }, []);
 
