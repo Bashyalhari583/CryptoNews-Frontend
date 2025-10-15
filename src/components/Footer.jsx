@@ -1,3 +1,8 @@
+import React from "react";
+import { Link } from "react-router-dom";
+import { FaTwitter, FaLinkedin, FaFacebook } from "react-icons/fa";
+import { useDarkMode } from "../context/ThemeContext"; // ⬅️ use the same context
+
 const Footer = () => {
   const { darkMode } = useDarkMode(); // get darkMode state from context
 

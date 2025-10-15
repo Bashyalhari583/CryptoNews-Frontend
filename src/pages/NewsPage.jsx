@@ -18,9 +18,9 @@ const NewsPage = () => {
     try {
       const res = await fetch("http://localhost:30074/api/news");
       const data = await res.json();
-
-      if (data && data.Data) {
-        const sorted = data.Data.sort(
+      console.log(data);
+      if (data && data.news) {
+        const sorted = data.news.sort(
           (a, b) => b.published_on - a.published_on
         );
         setNews(sorted.slice(0, 40)); // show 40 latest news
@@ -119,9 +119,9 @@ const NewsPage = () => {
               {currentCards.map((item, idx) => (
                 <NewsCard
                   key={idx}
-                  img={item.imageurl}
+                  img={item.image}
                   title={item.title}
-                  desc={item.body.slice(0, 100) + "..."}
+                  desc={item.description.slice(0, 100) + "..."}
                   darkMode={darkMode}
                 />
               ))}
